@@ -29,7 +29,7 @@ import {
 } from "@/features/api/courseApi";
 
 // ——— Change this to match your actual Cloudinary/upload‐API base URL:
-const MEDIA_API_BASE = "http://localhost:8080/api/v1/media";
+const MEDIA_API_BASE = `${import.meta.env.VITE_API_URL}/api/v1/media`;
 
 const LectureTab = () => {
   const { courseId, moduleId, lectureId } = useParams();
@@ -259,10 +259,7 @@ const LectureTab = () => {
   if (lectureLoading || videoInfoLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-[#111827] text-gray-800 dark:text-white">
-        <div className="flex items-center">
-           
-         
-        </div>
+        <div className="flex items-center"></div>
       </div>
     );
   }
