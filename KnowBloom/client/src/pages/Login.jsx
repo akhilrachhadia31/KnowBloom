@@ -1,3 +1,5 @@
+// src/pages/Login.jsx
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
@@ -28,14 +30,12 @@ import {
 } from "@/components/ui/input-otp";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  useLoadUserQuery,
   useLoginUserMutation,
   useRegisterUserMutation,
   useVerifyOtpMutation,
   authApi,
 } from "@/features/api/authApi";
 import Logo from "@/components/Logo";
-import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
@@ -57,44 +57,21 @@ const Login = () => {
   });
   const [tab, setTab] = useState("login");
 
-  // Track OTP dialog, resend state, error, and countdown
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [canResend, setCanResend] = useState(false);
   const [otpError, setOtpError] = useState("");
-
   const [otp, setOtp] = useState("");
   const [countdown, setCountdown] = useState(30);
   const intervalRef = useRef(null);
 
   const navigate = useNavigate();
-  const location = useLocation();
   const dispatch = useDispatch();
-
-  const { data, isLoading, refetch } = useLoadUserQuery();
-  const isAuthenticated = !!data?.user;
-  const isLoginPage = location.pathname === "/login";
-
-  useEffect(() => {
-    if (isLoginPage) {
-      refetch();
-    }
-  }, [isLoginPage, refetch]);
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated && isLoginPage) {
-      navigate("/", { replace: true });
-    }
-  }, [isLoading, isAuthenticated, isLoginPage, navigate]);
 
   const [registerUser, { error: registerError, isLoading: registerIsLoading }] =
     useRegisterUserMutation();
   const [loginUser, { error: loginError, isLoading: loginIsLoading }] =
     useLoginUserMutation();
   const [verifyOtp, { isLoading: otpIsLoading }] = useVerifyOtpMutation();
-
-  const handleLoginButtonClick = () => {
-    handleRegistration("login");
-  };
 
   const handleGoogleLoginSuccess = async (credentialResponse) => {
     const decoded = jwtDecode(credentialResponse.credential);
@@ -122,15 +99,9 @@ const Login = () => {
     }
   };
 
-  /**
-   * handleRegistration:
-   *   type === "signup" → call registerUser mutation (send OTP, show OTP dialog)
-   *   type === "login"  → call loginUser mutation (email/password), then clear cache+reload
-   */
   const handleRegistration = async (type) => {
     const inputData = type === "signup" ? signupInput : loginInput;
     const action = type === "signup" ? registerUser : loginUser;
-    const payload = { ...inputData };
 
     if (type === "signup" && !usernameRegex.test(signupInput.name)) {
       setFieldErrors((prev) => ({
@@ -140,7 +111,7 @@ const Login = () => {
       return;
     }
 
-    const result = await action(payload);
+    const result = await action({ ...inputData });
 
     if ("error" in result) {
       const field = result.error?.data?.field;
@@ -199,21 +170,8 @@ const Login = () => {
     setOtpError("");
   };
 
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, []);
-
   return (
     <div>
-      {!isLoginPage && !isAuthenticated && (
-        <div className="flex justify-end space-x-4 p-4">
-          <Button onClick={() => navigate("/login")}>Login</Button>
-          <Button onClick={() => navigate("/login")}>Signup</Button>
-        </div>
-      )}
-
       <div className="flex items-center w-full justify-center mt-20 mb-20">
         <Tabs value={tab} onValueChange={setTab} className="w-[400px]">
           <TabsList className="grid w-full grid-cols-2">
@@ -278,7 +236,7 @@ const Login = () => {
                   onClick={() => handleRegistration("signup")}
                   className="w-full mb-3"
                 >
-                  {registerIsLoading ? <>Signing up</> : "Signup"}
+                  {registerIsLoading ? "Signing up…" : "Signup"}
                 </Button>
 
                 <AlertDialog open={showOtpInput} onOpenChange={setShowOtpInput}>
@@ -294,8 +252,7 @@ const Login = () => {
                       <InputOTP
                         maxLength={6}
                         onChange={(value) => {
-                          const numeric = value.replace(/\D/g, "");
-                          setOtp(numeric);
+                          setOtp(value.replace(/\D/g, ""));
                           setOtpError("");
                         }}
                         value={otp}
@@ -334,8 +291,7 @@ const Login = () => {
                         onClick={() => {
                           setShowOtpInput(false);
                           setSignupInput({ name: "", email: "", password: "" });
-                          if (intervalRef.current)
-                            clearInterval(intervalRef.current);
+                          clearInterval(intervalRef.current);
                           setCanResend(false);
                           setOtp("");
                           setOtpError("");
@@ -345,9 +301,9 @@ const Login = () => {
                       </AlertDialogCancel>
                       <Button
                         onClick={handleOtpVerify}
-                        disabled={otpIsLoading || otp.trim().length < 6}
+                        disabled={otpIsLoading || otp.length < 6}
                       >
-                        {otpIsLoading ? <>Verifying…</> : "Verify OTP"}
+                        {otpIsLoading ? "Verifying…" : "Verify OTP"}
                       </Button>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -380,7 +336,7 @@ const Login = () => {
                     name="email"
                     value={loginInput.email}
                     onChange={(e) => changeInputHandler(e, "login")}
-                    placeholder="abc@gmail.com"
+                    placeholder="you@example.com"
                     required
                   />
                 </div>
@@ -391,7 +347,7 @@ const Login = () => {
                     name="password"
                     value={loginInput.password}
                     onChange={(e) => changeInputHandler(e, "login")}
-                    placeholder="xyz"
+                    placeholder="••••••••"
                     required
                   />
                 </div>
@@ -399,16 +355,10 @@ const Login = () => {
               <CardFooter className="flex flex-col gap-2">
                 <Button
                   disabled={loginIsLoading}
-                  onClick={handleLoginButtonClick}
+                  onClick={() => handleRegistration("login")}
                   className="w-full"
                 >
-                  {loginIsLoading ? (
-                    <>
-                      <span className="text-lg font-bold"> Logging in...</span>
-                    </>
-                  ) : (
-                    "Login"
-                  )}
+                  {loginIsLoading ? "Logging in…" : "Login"}
                 </Button>
 
                 <div className="flex items-center my-2">
@@ -416,22 +366,19 @@ const Login = () => {
                   <span className="mx-2 text-sm text-gray-500">OR</span>
                   <hr className="flex-grow border-t border-gray-300" />
                 </div>
-                <div className="w-full flex">
-                  <div style={{ width: 300 }}>
-                    <GoogleLogin
-                      onSuccess={handleGoogleLoginSuccess}
-                      onError={() => toast.error("Google Login Failed")}
-                      theme="outline"
-                      size="large"
-                      width={350}
-                      shape="pill"
-                    />
-                  </div>
-                </div>
+
+                <GoogleLogin
+                  onSuccess={handleGoogleLoginSuccess}
+                  onError={() => toast.error("Google Login Failed")}
+                  theme="outline"
+                  size="large"
+                  width={350}
+                  shape="pill"
+                />
 
                 <Button
                   variant="link"
-                  className="text-sm text-blue-600 hover:underline text-center mt-2 p-0 h-auto"
+                  className="text-sm text-blue-600 hover:underline mt-2 p-0 h-auto"
                   onClick={() => navigate("/forgot-password")}
                 >
                   Forgot Password?
