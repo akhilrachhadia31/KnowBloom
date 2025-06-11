@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 import RichTextEditor from "@/components/RichTextEditor";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Logo from "@/components/logo";
+import Logo from "@/components/Logo";
 import {
   AlertDialog,
   AlertDialogAction,

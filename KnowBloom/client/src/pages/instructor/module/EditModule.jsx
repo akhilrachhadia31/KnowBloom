@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronRight, Trash2 } from "lucide-react";
-import Logo from "@/components/logo";
+import Logo from "@/components/Logo";
 
 import {
   useEditModuleMutation,
