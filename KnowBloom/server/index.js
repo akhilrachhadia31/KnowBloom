@@ -52,6 +52,10 @@ app.use("/api/v1/course", courseRoute);
 app.use("/api/v1/purchase", purchaseRouter);
 app.use("/api/v1/progress", courseProgressRoute);
 
+app.get("/", (req, res) => {
+  res.send("KnowBloom backend is running!");
+});
+
 app.use((err, req, res, next) => {
   console.error("Global error handler:", err.stack);
   res.status(500).json({ message: "Something went wrong!" });
@@ -61,8 +65,6 @@ app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-console.log(
-  `🚀 Server running at ${
-    process.env.BACKEND_URL || "http://localhost:" + PORT
-  }`
-);
+app.listen(PORT, () => {
+  console.log(`🚀 Server running at port ${PORT}`);
+});
