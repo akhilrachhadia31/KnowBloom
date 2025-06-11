@@ -1,4 +1,3 @@
-// app.js
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
@@ -25,15 +24,22 @@ app.use(
   express.raw({ type: "application/json" })
 );
 
+app.use((req, res, next) => {
+  console.log("Incoming request origin:", req.headers.origin);
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
   })
 );
+
 app.use(helmet());
 
 app.use(
@@ -42,11 +48,12 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      sameSite: "none", // allow cross-site cookies
-      secure: true, // cookies only over HTTPS (required for Render)
+      sameSite: "none", // Required for cross-site cookies (Render uses 2 domains)
+      secure: true, // Required for HTTPS
     },
   })
 );
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -58,10 +65,6 @@ app.use("/api/v1/progress", courseProgressRoute);
 
 app.get("/", (req, res) => {
   res.send("KnowBloom backend is running!");
-});
-app.use((req, res, next) => {
-  console.log("Incoming request origin:", req.headers.origin);
-  next();
 });
 
 app.use((err, req, res, next) => {
