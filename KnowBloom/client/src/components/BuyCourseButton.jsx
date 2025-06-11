@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useCreateCheckoutSessionMutation } from "@/features/api/purchaseApi";
 import Logo from "@/components/Logo";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 const BuyCourseButton = ({ courseId }) => {
   const [

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { toast } from "sonner";
+import toast from "react-hot-toast"
 import { Badge } from "@/components/ui/badge";
 import {
   CheckCircle2,
