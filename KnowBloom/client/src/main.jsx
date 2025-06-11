@@ -1,33 +1,39 @@
+// src/index.jsx
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
+
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import App from "./App.jsx";
 import { Provider } from "react-redux";
-import { appStore } from "./app/store";
 import { Toaster } from "react-hot-toast";
-import { useLoadUserQuery } from "./features/api/authApi";
-import LoadingSpinner from "./components/LoadingSpinner";
+
+import App from "./App.jsx";
+import { appStore } from "./app/store";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { UserContext } from "./context/UserContext";
-import Logo from "./components/Logo";
 import LoadingScreen from "./loadingscreen";
+import { useLoadUserQuery } from "./features/api/authApi";
 
-const GOOGLE_CLIENT_ID =
-  "103275768227-2jelbufhmhddrd23fch0pb5ls276kboe.apps.googleusercontent.com";
+// must be defined in top-level .env as VITE_GOOGLE_CLIENT_ID=…
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
-const Custom = ({ children }) => {
-  const { isLoading, data } = useLoadUserQuery();
+const AuthLoader = ({ children }) => {
+  // never auto-fetch on public auth routes:
+  const skip = [
+    "/login",
+    "/signup",
+    "/forgot-password",
+    "/reset-password",
+  ].some((p) => window.location.pathname.startsWith(p));
+
+  const { data, isLoading } = useLoadUserQuery(undefined, { skip });
+
+  if (isLoading) return <LoadingScreen />;
+
   return (
-    <>
-      {isLoading ? (
-        <LoadingScreen />
-      ) : (
-        <UserContext.Provider value={{ user: data?.user }}>
-          {children}
-        </UserContext.Provider>
-      )}
-    </>
+    <UserContext.Provider value={{ user: data?.user }}>
+      {children}
+    </UserContext.Provider>
   );
 };
 
@@ -36,10 +42,10 @@ createRoot(document.getElementById("root")).render(
     <ThemeProvider>
       <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
         <Provider store={appStore}>
-          <Custom>
+          <AuthLoader>
             <App />
             <Toaster />
-          </Custom>
+          </AuthLoader>
         </Provider>
       </GoogleOAuthProvider>
     </ThemeProvider>
