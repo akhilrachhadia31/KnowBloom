@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Trash2, PlusCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
-import Logo from "@/components/logo";
+import Logo from "@/components/Logo";
 
 import {
   useGetLectureQuizQuery,
