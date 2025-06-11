@@ -41,6 +41,10 @@ app.use(
     secret: process.env.SECRET_KEY || "your-secret",
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      sameSite: "none", // allow cross-site cookies
+      secure: true, // cookies only over HTTPS (required for Render)
+    },
   })
 );
 app.use(passport.initialize());
@@ -54,6 +58,10 @@ app.use("/api/v1/progress", courseProgressRoute);
 
 app.get("/", (req, res) => {
   res.send("KnowBloom backend is running!");
+});
+app.use((req, res, next) => {
+  console.log("Incoming request origin:", req.headers.origin);
+  next();
 });
 
 app.use((err, req, res, next) => {
