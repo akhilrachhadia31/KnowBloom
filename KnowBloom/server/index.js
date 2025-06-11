@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import path from "path";
 import connectDB from "./database/db.js";
 import userRoute from "./routes/user.route.js";
 import courseRoute from "./routes/course.route.js";
@@ -12,6 +13,7 @@ import passport from "passport";
 import session from "express-session";
 import helmet from "helmet";
 import "./passport.js";
+import history from "connect-history-api-fallback";
 
 dotenv.config();
 connectDB();
@@ -67,11 +69,23 @@ app.get("/", (req, res) => {
   res.send("KnowBloom backend is running!");
 });
 
+// Serve static React frontend assets
+const __dirname = path.resolve();
+app.use(
+  history({
+    index: "/index.html",
+    verbose: true,
+  })
+);
+app.use(express.static(path.join(__dirname, "../client/dist"))); // Adjust path if needed
+
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error("Global error handler:", err.stack);
   res.status(500).json({ message: "Something went wrong!" });
 });
 
+// 404 handler for API or other undefined routes
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });

@@ -122,8 +122,10 @@ const appRouter = createBrowserRouter([
       },
       { path: "performance/reviews", element: <Reviews /> },
       { path: "performance/insights", element: <CourseInsights /> },
-      
-     { path: "performance/announcements", element: <InstructorAnnouncements /> },
+      {
+        path: "performance/announcements",
+        element: <InstructorAnnouncements />,
+      },
     ],
   },
 ]);
