@@ -1,4 +1,4 @@
-import LogoKnowBloom from "./KnowBloomLoader";
+import LogoKnowBloom from "./LogoKnowBloom.jsx";
 
 const KnowBloomLoader = () => (
   <div
