@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 const isGuest = (req, res, next) => {
   const token = req.cookies.token;
 
@@ -7,7 +6,7 @@ const isGuest = (req, res, next) => {
   }
 
   next();
-=======
+
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
