@@ -14,7 +14,7 @@ import Logo from "./components/Logo";
 import LoadingScreen from "./loadingscreen";
 
 const GOOGLE_CLIENT_ID =
-  "103275768227-2jelbufhmhddrd23fch0pb5ls276kboe.apps.googleusercontent.com";
+  "93973601927-1oac2m22301vqafe54qkck61l9h19l9j.apps.googleusercontent.com";
 
 const Custom = ({ children }) => {
   const { isLoading, data } = useLoadUserQuery();

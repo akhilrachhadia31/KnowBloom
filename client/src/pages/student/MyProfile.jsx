@@ -9,11 +9,19 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+<<<<<<< HEAD
+=======
+import { Eye, EyeOff } from "lucide-react";
+>>>>>>> e0bb359b91c4b7263b1c50098be3c68aee652981
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+<<<<<<< HEAD
+=======
+
+>>>>>>> e0bb359b91c4b7263b1c50098be3c68aee652981
 import {
   useLoadUserQuery,
   useUpdateUserMutation,
@@ -47,6 +55,11 @@ const Profile = () => {
   const [fadeTransition, setFadeTransition] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [currentPasswordValid, setCurrentPasswordValid] = useState(null);
+<<<<<<< HEAD
+=======
+  const [otpDialogOpen, setOtpDialogOpen] = useState(false);
+  const [otp, setOtp] = useState("");
+>>>>>>> e0bb359b91c4b7263b1c50098be3c68aee652981
 
   const { data, isLoading, refetch } = useLoadUserQuery();
   const [updateUser] = useUpdateUserMutation();
@@ -71,6 +84,7 @@ const Profile = () => {
       setRemoveStatus("idle");
     }
   };
+<<<<<<< HEAD
 
   const validateCurrentPassword = async () => {
     if (currentPassword.trim().length < 4) {
@@ -91,6 +105,9 @@ const Profile = () => {
       setIsPasswordInvalid(true);
     }
   };
+=======
+ const Profile = () => {
+>>>>>>> e0bb359b91c4b7263b1c50098be3c68aee652981
 
   useEffect(() => {
     if (currentPassword) validateCurrentPassword();
@@ -142,6 +159,7 @@ const Profile = () => {
 
     if (!nameChanged && !emailChanged && !photoChanged && !newFieldsChanged) {
       toast.info("No changes detected.");
+<<<<<<< HEAD
       return;
     }
 
@@ -390,6 +408,9 @@ const Profile = () => {
               <Label>Confirm Password</Label>
               <Input
                 type={showConfirmPassword ? "text" : "password"}
+=======
+      const Profile = () => {
+>>>>>>> e0bb359b91c4b7263b1c50098be3c68aee652981
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm new password"
@@ -416,9 +437,56 @@ const Profile = () => {
             {/* Update button: right-aligned */}
             <div className="flex justify-end">
               <Button className="mt-4" onClick={handlePasswordChange}>
+<<<<<<< HEAD
                 Update Password
               </Button>
             </div>
+=======
+              <Button className="mt-4" onClick={() => setOtpDialogOpen(true)}>
+                Update Password
+              </Button>
+            </div>
+
+            <Dialog open={otpDialogOpen} onOpenChange={setOtpDialogOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Enter OTP</DialogTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Please enter the 6-digit code sent to your email to
+                    confirm password change.
+                  </p>
+                </DialogHeader>
+                <div className="space-y-2">
+                  <Label htmlFor="otp">OTP Code</Label>
+                  <Input
+                    id="otp"
+                    placeholder="123456"
+                    value={otp}
+                    maxLength={6}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                  />
+                </div>
+                <DialogFooter>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setOtpDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setOtpDialogOpen(false);
+                      handlePasswordChange();
+                      setOtp("");
+                    }}
+                    disabled={otp.trim().length < 6}
+                  >
+                    Verify OTP
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+>>>>>>> e0bb359b91c4b7263b1c50098be3c68aee652981
           </Card>
         )}
       </div>
@@ -426,4 +494,8 @@ const Profile = () => {
   );
 };
 
+<<<<<<< HEAD
 export default Profile;
+=======
+export default Profile;
+>>>>>>> e0bb359b91c4b7263b1c50098be3c68aee652981

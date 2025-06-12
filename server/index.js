@@ -21,37 +21,44 @@ connectDB();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// 🛡️ Trust proxy for secure cookies on Render (IMPORTANT)
+app.set("trust proxy", 1);
+
+// 🧾 Stripe webhook needs raw body
 app.use(
   "/api/v1/purchaseCourse/webhook",
   express.raw({ type: "application/json" })
 );
 
-app.use((req, res, next) => {
-  console.log("Incoming request origin:", req.headers.origin);
-  next();
-});
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
+// 🌍 CORS (must be above all routes)
 app.use(
   cors({
+<<<<<<< HEAD
     origin: "https://knowbloom.onrender.com",
+=======
+    origin: "https://knowbloom.onrender.com", // frontend domain
+>>>>>>> e0bb359b91c4b7263b1c50098be3c68aee652981
     credentials: true,
   })
 );
 
+// 🧱 Body parsers (for JSON and forms)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// 🛡️ Security headers
 app.use(helmet());
 
+// 🔐 Session and Passport setup
 app.use(
   session({
     secret: process.env.SECRET_KEY || "your-secret",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      sameSite: "none", // Required for cross-site cookies (Render uses 2 domains)
-      secure: true, // Required for HTTPS
+      sameSite: "none", // needed for cross-origin cookies
+      secure: true,     // HTTPS only
     },
   })
 );
@@ -59,6 +66,13 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// 🧪 Log origin (optional for debug)
+app.use((req, res, next) => {
+  console.log("Request Origin:", req.headers.origin);
+  next();
+});
+
+// 🔗 Routes
 app.use("/api/v1/media", mediaRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/course", courseRoute);
@@ -69,7 +83,7 @@ app.get("/", (req, res) => {
   res.send("KnowBloom backend is running!");
 });
 
-// Serve static React frontend assets
+// 📦 Serve frontend build
 const __dirname = path.resolve();
 app.use(
   history({
@@ -77,19 +91,20 @@ app.use(
     verbose: true,
   })
 );
-app.use(express.static(path.join(__dirname, "../client/dist"))); // Adjust path if needed
+app.use(express.static(path.join(__dirname, "../client/dist")));
 
-// Error handling middleware
+// ❌ Error handling
 app.use((err, req, res, next) => {
   console.error("Global error handler:", err.stack);
   res.status(500).json({ message: "Something went wrong!" });
 });
 
-// 404 handler for API or other undefined routes
+// ❌ 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
+// 🚀 Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at port ${PORT}`);
 });

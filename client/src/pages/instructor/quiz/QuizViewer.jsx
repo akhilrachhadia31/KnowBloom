@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { toast } from "react-hot-toast";
 import { useGetLectureQuizQuery } from "@/features/api/courseApi";
 
 export default function QuizViewer({
@@ -139,7 +140,7 @@ export default function QuizViewer({
   const handleSubmit = () => {
     // ensure every question has an answer
     if (selectedAnswers.some((ans) => ans < 0)) {
-      alert("Please answer all questions before submitting.");
+      toast.error("Please answer all questions before submitting.");
       return;
     }
     // compute score

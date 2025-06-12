@@ -4,7 +4,11 @@ import { useGetPurchasedCoursesQuery } from "@/features/api/purchaseApi";
 import { useGetPublishedCourseQuery } from "@/features/api/courseApi";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
+<<<<<<< HEAD
 import LoadingScreen from "@/loadingscreen";
+=======
+import LoadingScreen from "./loadingscreen";
+>>>>>>> e0bb359b91c4b7263b1c50098be3c68aee652981
 
 const PurchaseHistory = () => {
   const { user } = useSelector((store) => store.auth);
@@ -31,7 +35,11 @@ const PurchaseHistory = () => {
   }
 
   if (purchasesLoading || publishedLoading) {
+<<<<<<< HEAD
     <LoadingScreen />;
+=======
+     <LoadingScreen />
+>>>>>>> e0bb359b91c4b7263b1c50098be3c68aee652981
   }
 
   if (purchasesError || publishedError) {

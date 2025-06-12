@@ -7,6 +7,7 @@ import RichTextEditor from "@/components/RichTextEditor";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Logo from "@/components/Logo";
+import LoadingScreen from "@/loadingscreen";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -232,7 +233,9 @@ const CourseTab = () => {
     }
   };
 
-  if (loadingBasic) return <p>Loading…</p>;
+   if (loadingBasic) {
+    <LoadingScreen />;
+  }
   if (errorBasic) return <p>Failed to load course.</p>;
 
   return (

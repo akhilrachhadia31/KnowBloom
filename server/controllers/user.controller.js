@@ -179,10 +179,18 @@ export const login = async (req, res) => {
 
 export const logout = async (_, res) => {
   try {
-    return res.status(200).cookie("token", "", { maxAge: 0 }).json({
-      message: "Logged out successfully.",
-      success: true,
-    });
+    return res
+      .status(200)
+      .cookie("token", "", {
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        secure: process.env.NODE_ENV === "production",
+        expires: new Date(0),
+      })
+      .json({
+        message: "Logged out successfully.",
+        success: true,
+      });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -257,23 +265,41 @@ export const updateProfile = async (req, res) => {
     }
 
     // change email
+    let otpSent = false;
     if (email && email.toLowerCase() !== user.email) {
-      const normalized = email.toLowerCase();
+      const normalized = email.trim().toLowerCase();
       const emailRegex =
-        /^[a-z0-9]+@(gmail\.com|outlook\.com|yahoo\.com|icloud\.com)$/;
-      if (!emailRegex.test(normalized))
+        /^[a-zA-Z0-9](\.?[a-zA-Z0-9_\-+])*@[a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)*\.[a-zA-Z]{2,}$/;
+      const [localPart, domainPart] = normalized.split("@");
+      if (
+        !emailRegex.test(normalized) ||
+        normalized.length > 254 ||
+        localPart.length > 64 ||
+        localPart.startsWith(".") ||
+        localPart.endsWith(".") ||
+        localPart.includes("..") ||
+        !domainPart ||
+        domainPart.startsWith("-") ||
+        domainPart.endsWith("-") ||
+        domainPart.includes("..")
+      ) {
         return res.status(400).json({
           success: false,
           message: "Invalid email format.",
           field: "email",
         });
+      }
       if (await User.findOne({ email: normalized, _id: { $ne: userId } }))
         return res.status(400).json({
           success: false,
           message: "Email is already in use.",
           field: "email",
         });
-      updatedFields.email = normalized;
+
+      const otp = crypto.randomInt(100000, 999999).toString();
+      saveOtp(normalized, otp, { userId });
+      await sendOtpEmail(normalized, otp, user.name);
+      otpSent = true;
     }
 
     // change role if provided
@@ -312,7 +338,18 @@ export const updateProfile = async (req, res) => {
       return res.status(200).json({
         success: true,
         user: updated,
-        message: "Profile updated successfully.",
+        otpSent,
+        message: otpSent
+          ? "OTP sent to your new email. Please verify."
+          : "Profile updated successfully.",
+      });
+    }
+
+    if (otpSent) {
+      return res.status(200).json({
+        success: true,
+        otpSent: true,
+        message: "OTP sent to your new email. Please verify.",
       });
     }
 
@@ -395,6 +432,44 @@ export const updatePassword = async (req, res) => {
     return res
       .status(500)
       .json({ success: false, message: "Failed to update password." });
+  }
+};
+
+export const verifyEmailChange = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const record = getOtpData(email.toLowerCase());
+    if (!record) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP expired or invalid.",
+        field: "otp",
+      });
+    }
+    if (record.otp !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Incorrect OTP.",
+        field: "otp",
+      });
+    }
+
+    const user = await User.findById(record.data.userId);
+    if (!user) {
+      deleteOtp(email.toLowerCase());
+      return res.status(404).json({ success: false, message: "User not found." });
+    }
+
+    user.email = email.toLowerCase();
+    await user.save();
+    deleteOtp(email.toLowerCase());
+
+    return res.json({ success: true, message: "Email updated successfully." });
+  } catch (error) {
+    console.error("Verify email change error:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Failed to verify OTP." });
   }
 };
 
