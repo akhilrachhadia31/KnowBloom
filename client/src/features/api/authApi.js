@@ -93,6 +93,13 @@ export const authApi = createApi({
         body: { email, otp },
       }),
     }),
+    verifyEmailChange: builder.mutation({
+      query: ({ email, otp }) => ({
+        url: "verify-email-change",
+        method: "POST",
+        body: { email, otp },
+      }),
+    }),
     forgotPassword: builder.mutation({
       query: ({ email }) => ({
         url: "forgot-password", // remove leading slash
@@ -130,6 +137,7 @@ export const {
   useUpdatePasswordUserMutation,
   useGetInstructorByIdQuery,
   useVerifyOtpMutation,
+  useVerifyEmailChangeMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
   useGetUserByNameQuery,

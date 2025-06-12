@@ -265,6 +265,7 @@ export const updateProfile = async (req, res) => {
     }
 
     // change email
+    let otpSent = false;
     if (email && email.toLowerCase() !== user.email) {
       const normalized = email.trim().toLowerCase();
       const emailRegex =
@@ -294,7 +295,11 @@ export const updateProfile = async (req, res) => {
           message: "Email is already in use.",
           field: "email",
         });
-      updatedFields.email = normalized;
+
+      const otp = crypto.randomInt(100000, 999999).toString();
+      saveOtp(normalized, otp, { userId });
+      await sendOtpEmail(normalized, otp, user.name);
+      otpSent = true;
     }
 
     // change role if provided
@@ -333,7 +338,18 @@ export const updateProfile = async (req, res) => {
       return res.status(200).json({
         success: true,
         user: updated,
-        message: "Profile updated successfully.",
+        otpSent,
+        message: otpSent
+          ? "OTP sent to your new email. Please verify."
+          : "Profile updated successfully.",
+      });
+    }
+
+    if (otpSent) {
+      return res.status(200).json({
+        success: true,
+        otpSent: true,
+        message: "OTP sent to your new email. Please verify.",
       });
     }
 
@@ -416,6 +432,44 @@ export const updatePassword = async (req, res) => {
     return res
       .status(500)
       .json({ success: false, message: "Failed to update password." });
+  }
+};
+
+export const verifyEmailChange = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const record = getOtpData(email.toLowerCase());
+    if (!record) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP expired or invalid.",
+        field: "otp",
+      });
+    }
+    if (record.otp !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Incorrect OTP.",
+        field: "otp",
+      });
+    }
+
+    const user = await User.findById(record.data.userId);
+    if (!user) {
+      deleteOtp(email.toLowerCase());
+      return res.status(404).json({ success: false, message: "User not found." });
+    }
+
+    user.email = email.toLowerCase();
+    await user.save();
+    deleteOtp(email.toLowerCase());
+
+    return res.json({ success: true, message: "Email updated successfully." });
+  } catch (error) {
+    console.error("Verify email change error:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Failed to verify OTP." });
   }
 };
 

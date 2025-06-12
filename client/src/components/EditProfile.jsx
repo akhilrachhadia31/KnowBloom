@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Dialog,
@@ -15,10 +15,17 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import {
   useLoadUserQuery,
   useUpdateUserMutation,
   useCheckPasswordMutation,
   useUpdatePasswordUserMutation,
+  useVerifyEmailChangeMutation,
 } from "@/features/api/authApi";
 import { toast } from "react-hot-toast";
 
@@ -47,6 +54,15 @@ const Profile = () => {
   const [fadeTransition, setFadeTransition] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [currentPasswordValid, setCurrentPasswordValid] = useState(null);
+  const [showEmailOtp, setShowEmailOtp] = useState(false);
+  const [emailOtp, setEmailOtp] = useState("");
+  const [emailCountdown, setEmailCountdown] = useState(30);
+  const [otpError, setOtpError] = useState("");
+  const [pendingEmail, setPendingEmail] = useState("");
+  const emailIntervalRef = useRef(null);
+
+  const [verifyEmailChange, { isLoading: verifyEmailLoading }] =
+    useVerifyEmailChangeMutation();
 
   const { data, isLoading, refetch } = useLoadUserQuery();
   const [updateUser] = useUpdateUserMutation();
@@ -164,7 +180,6 @@ const Profile = () => {
         } else {
           payload.append("profilePhoto", profilePhoto);
         }
-        await updateUser(payload).unwrap();
       } else {
         payload = {
           name,
@@ -174,13 +189,34 @@ const Profile = () => {
           instagram,
           twitter,
         };
-        await updateUser(payload).unwrap();
       }
 
-      toast.success("Profile updated successfully!");
+      const result = await updateUser(payload).unwrap();
+
       setProfilePhoto(null);
       setRemoveStatus("idle");
-      refetch(); // Refresh user data
+
+      if (result.otpSent) {
+        setPendingEmail(email);
+        setShowEmailOtp(true);
+        setEmailCountdown(30);
+        setOtpError("");
+        if (emailIntervalRef.current) clearInterval(emailIntervalRef.current);
+        emailIntervalRef.current = setInterval(() => {
+          setEmailCountdown((t) => {
+            if (t <= 1) {
+              clearInterval(emailIntervalRef.current);
+              setOtpError("OTP expired");
+              return 0;
+            }
+            return t - 1;
+          });
+        }, 1000);
+        toast.success("OTP sent!");
+      } else {
+        toast.success(result.message || "Profile updated successfully!");
+        refetch();
+      }
     } catch (err) {
       const message =
         err?.data?.message || err?.error || "An unexpected error occurred.";
@@ -189,6 +225,26 @@ const Profile = () => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleResendOtp = async () => {
+    setOtpError("");
+    setEmailCountdown(30);
+    await updateUser({ email: pendingEmail }).unwrap();
+  };
+
+  const handleVerifyEmailOtp = async () => {
+    const result = await verifyEmailChange({ email: pendingEmail, otp: emailOtp });
+    if ("error" in result) {
+      setOtpError(result.error.data?.message || "Incorrect OTP");
+      return;
+    }
+    toast.success(result.data?.message || "Email updated successfully!");
+    setShowEmailOtp(false);
+    setEmailOtp("");
+    setOtpError("");
+    if (emailIntervalRef.current) clearInterval(emailIntervalRef.current);
+    refetch();
   };
 
   const switchTab = (tab) => {
@@ -422,6 +478,72 @@ const Profile = () => {
           </Card>
         )}
       </div>
+      <Dialog open={showEmailOtp} onOpenChange={setShowEmailOtp}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enter OTP</DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              Please enter the 6-digit code sent to your new email.
+            </p>
+          </DialogHeader>
+          <div className="space-y-2">
+            <InputOTP
+              maxLength={6}
+              value={emailOtp}
+              onChange={(val) => {
+                setEmailOtp(val.replace(/\D/g, ""));
+                setOtpError("");
+              }}
+            >
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+              </InputOTPGroup>
+              <InputOTPSeparator />
+              <InputOTPGroup>
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+            <p className="text-sm text-gray-500">
+              Time remaining: {emailCountdown} seconds
+            </p>
+            {otpError && <p className="text-red-500 text-sm">{otpError}</p>}
+          </div>
+          <DialogFooter>
+            <div className="flex-grow text-left">
+              <Button
+                variant="link"
+                onClick={handleResendOtp}
+                disabled={emailCountdown > 0}
+                className="p-0 text-sm"
+              >
+                Resend OTP
+              </Button>
+            </div>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setShowEmailOtp(false);
+                if (emailIntervalRef.current)
+                  clearInterval(emailIntervalRef.current);
+                setEmailOtp("");
+                setOtpError("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleVerifyEmailOtp}
+              disabled={verifyEmailLoading || emailOtp.trim().length < 6}
+            >
+              {verifyEmailLoading ? "Verifying…" : "Verify OTP"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
