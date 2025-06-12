@@ -258,15 +258,28 @@ export const updateProfile = async (req, res) => {
 
     // change email
     if (email && email.toLowerCase() !== user.email) {
-      const normalized = email.toLowerCase();
+      const normalized = email.trim().toLowerCase();
       const emailRegex =
-        /^[a-z0-9]+@(gmail\.com|outlook\.com|yahoo\.com|icloud\.com)$/;
-      if (!emailRegex.test(normalized))
+        /^[a-zA-Z0-9](\.?[a-zA-Z0-9_\-+])*@[a-zA-Z0-9\-]+(\.[a-zA-Z0-9\-]+)*\.[a-zA-Z]{2,}$/;
+      const [localPart, domainPart] = normalized.split("@");
+      if (
+        !emailRegex.test(normalized) ||
+        normalized.length > 254 ||
+        localPart.length > 64 ||
+        localPart.startsWith(".") ||
+        localPart.endsWith(".") ||
+        localPart.includes("..") ||
+        !domainPart ||
+        domainPart.startsWith("-") ||
+        domainPart.endsWith("-") ||
+        domainPart.includes("..")
+      ) {
         return res.status(400).json({
           success: false,
           message: "Invalid email format.",
           field: "email",
         });
+      }
       if (await User.findOne({ email: normalized, _id: { $ne: userId } }))
         return res.status(400).json({
           success: false,
