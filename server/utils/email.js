@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
     pass: EMAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: false, // helpful in dev
+    rejectUnauthorized: process.env.NODE_ENV !== "development",
   },
 });
 
