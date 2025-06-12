@@ -30,10 +30,11 @@ app.use(
   express.raw({ type: "application/json" })
 );
 
-// 🌍 Enable CORS for frontend
+// 🌍 Enable CORS for frontend using environment variable or default localhost
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 app.use(
   cors({
-    origin: "https://knowbloom.onrender.com", // replace with your frontend domain
+    origin: FRONTEND_URL,
     credentials: true,
   })
 );
