@@ -1,5 +1,6 @@
 import React from "react";
 import { BookOpen, Leaf } from "lucide-react";
+import html2canvas from "html2canvas";
 
 const sizeClasses = {
   sm: { icon: "w-6 h-6", text: "text-lg", spacing: "gap-2" },
