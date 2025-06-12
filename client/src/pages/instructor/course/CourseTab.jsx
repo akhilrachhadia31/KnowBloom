@@ -149,8 +149,21 @@ const CourseTab = () => {
   };
 
   const saveChanges = async () => {
-    if (!form.courseTitle.trim() || !form.description.trim()) {
-      toast.error("Title and description are required.");
+    const hasEmptyLearn = form.whatYouWillLearn.some((i) => !i.trim());
+    const hasEmptyPrior = form.priorRequirements.some((i) => !i.trim());
+
+    if (
+      !form.courseTitle.trim() ||
+      !form.subTitle.trim() ||
+      !form.description.trim() ||
+      !form.category.trim() ||
+      !form.courseLevel.trim() ||
+      form.coursePrice === "" ||
+      (!form.courseThumbnail && !preview) ||
+      hasEmptyLearn ||
+      hasEmptyPrior
+    ) {
+      toast.error("Please fill all fields.");
       return;
     }
     const formData = new FormData();
