@@ -230,6 +230,7 @@ const Profile = () => {
   const handleResendOtp = async () => {
     setOtpError("");
     setEmailCountdown(30);
+    setEmailOtp("");
     await updateUser({ email: pendingEmail }).unwrap();
   };
 
@@ -537,7 +538,11 @@ const Profile = () => {
             </Button>
             <Button
               onClick={handleVerifyEmailOtp}
-              disabled={verifyEmailLoading || emailOtp.trim().length < 6}
+              disabled={
+                verifyEmailLoading ||
+                emailOtp.trim().length < 6 ||
+                emailCountdown <= 0
+              }
             >
               {verifyEmailLoading ? "Verifying…" : "Verify OTP"}
             </Button>

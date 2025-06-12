@@ -171,6 +171,7 @@ const Login = () => {
     setOtpError("");
     setCanResend(false);
     setCountdown(30);
+    setOtp("");
     await handleRegistration("signup");
   };
 
@@ -335,7 +336,9 @@ const Login = () => {
                       </AlertDialogCancel>
                       <Button
                         onClick={handleOtpVerify}
-                        disabled={otpIsLoading || otp.trim().length < 6}
+                        disabled={
+                          otpIsLoading || otp.trim().length < 6 || countdown <= 0
+                        }
                       >
                         {otpIsLoading ? <>Verifying…</> : "Verify OTP"}
                       </Button>
