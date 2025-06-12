@@ -2,7 +2,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { userLoggedIn, userLoggedOut } from "../authSlice";
 
-// Base URL for user-related APIs. Falls back to relative path if env not set.
+
 const USER_API =
   import.meta.env.VITE_USER_API || "/api/v1/user";
 
