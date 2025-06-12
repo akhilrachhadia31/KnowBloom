@@ -10,6 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import LoadingScreen from "@/loadingscreen";
 
 const Dashboard = () => {
   const { data, isSuccess, isError, isLoading } = useGetPurchasedCoursesQuery();
@@ -67,12 +68,7 @@ const Dashboard = () => {
     }).format(value);
 
   // Early returns BELOW all hooks
-  if (isLoading)
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <span className="text-gray-500 dark:text-gray-400">Loading...</span>
-      </div>
-    );
+  if (isLoading) return <LoadingScreen />;
   if (isError)
     return (
       <div className="text-red-500 dark:text-red-400">

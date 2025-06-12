@@ -37,7 +37,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: "https://knowbloom.onrender.com",
     credentials: true,
   })
 );

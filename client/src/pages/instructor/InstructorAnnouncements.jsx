@@ -16,6 +16,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import LoadingScreen from "@/loadingscreen";
 
 const InstructorAnnouncements = () => {
   // 1) fetch all courses you created
@@ -142,7 +143,7 @@ const InstructorAnnouncements = () => {
           <SelectContent>
             {loadingCourses ? (
               <SelectItem value="__loading" disabled>
-                Loading...
+              <LoadingScreen/>
               </SelectItem>
             ) : courses.length === 0 ? (
               <SelectItem value="__none" disabled>

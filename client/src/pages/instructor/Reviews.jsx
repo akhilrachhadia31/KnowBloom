@@ -98,7 +98,7 @@ export default function Reviews() {
         {isCoursesLoading ? (
           <p className="text-gray-600 dark:text-gray-300">Loading courses…</p>
         ) : isCoursesError ? (
-          <p className="text-yellow-500">No review given to this course </p>
+          <p className="text-yellow-500">No review given for the courses </p>
         ) : (
           <Select
             value={selectedCourseId}
@@ -125,7 +125,6 @@ export default function Reviews() {
         placeholder="Search reviews..."
         className="flex-1 max-w-md mt-12"
       />
-
 
       {/* reviews card */}
       {selectedCourseId && (

@@ -411,7 +411,7 @@ export const forgotPassword = async (req, res) => {
     if (!user)
       return res
         .status(404)
-        .json({ success: false, message: "Page not found with this email." });
+        .json({ success: false, message: "User not found with this email." });
 
     // Generate token and set expiry
     const resetToken = crypto.randomBytes(32).toString("hex");

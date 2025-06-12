@@ -19,6 +19,7 @@ import {
 import { Edit, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import LoadingScreen from "@/loadingscreen";
 
 const CourseTable = () => {
   const navigate = useNavigate();
@@ -61,7 +62,10 @@ const CourseTable = () => {
       });
   }, [data?.courses, searchText, statusFilter]);
 
-  if (isLoading) return <h1>Loading...</h1>;
+  if (isLoading)
+  {
+    <LoadingScreen/>
+  }
 
   return (
     <div className="mb-20">
