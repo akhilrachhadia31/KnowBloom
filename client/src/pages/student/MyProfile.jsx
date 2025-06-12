@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
@@ -19,8 +18,15 @@ import {
   useUpdateUserMutation,
   useCheckPasswordMutation,
   useUpdatePasswordUserMutation,
+  useVerifyOtpMutation,
 } from "@/features/api/authApi";
 import { toast } from "react-hot-toast";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 const Profile = () => {
   const [name, setName] = useState("");
@@ -48,8 +54,18 @@ const Profile = () => {
   const [passwordError, setPasswordError] = useState("");
   const [currentPasswordValid, setCurrentPasswordValid] = useState(null);
 
+  // OTP state for email change
+  const [showOtpDialog, setShowOtpDialog] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [otpError, setOtpError] = useState("");
+  const [countdown, setCountdown] = useState(30);
+  const [canResend, setCanResend] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState("");
+  const intervalRef = useRef(null);
+
   const { data, isLoading, refetch } = useLoadUserQuery();
   const [updateUser] = useUpdateUserMutation();
+  const [verifyOtp, { isLoading: otpIsLoading }] = useVerifyOtpMutation();
   const [checkPassword, { isLoading: isCheckingPassword }] =
     useCheckPasswordMutation();
 
@@ -164,7 +180,28 @@ const Profile = () => {
         } else {
           payload.append("profilePhoto", profilePhoto);
         }
-        await updateUser(payload).unwrap();
+        const res = await updateUser(payload).unwrap();
+        if (res.otpRequired) {
+          setPendingEmail(res.pendingEmail || email);
+          setShowOtpDialog(true);
+          setCountdown(30);
+          setOtp("");
+          setOtpError("");
+          clearInterval(intervalRef.current);
+          intervalRef.current = setInterval(() => {
+            setCountdown((t) => {
+              if (t <= 1) {
+                clearInterval(intervalRef.current);
+                setCanResend(true);
+                return 0;
+              }
+              return t - 1;
+            });
+          }, 1000);
+          toast.success("OTP sent!");
+          setCanResend(false);
+          return;
+        }
       } else {
         payload = {
           name,
@@ -174,7 +211,28 @@ const Profile = () => {
           instagram,
           twitter,
         };
-        await updateUser(payload).unwrap();
+        const res = await updateUser(payload).unwrap();
+        if (res.otpRequired) {
+          setPendingEmail(res.pendingEmail || email);
+          setShowOtpDialog(true);
+          setCountdown(30);
+          setOtp("");
+          setOtpError("");
+          clearInterval(intervalRef.current);
+          intervalRef.current = setInterval(() => {
+            setCountdown((t) => {
+              if (t <= 1) {
+                clearInterval(intervalRef.current);
+                setCanResend(true);
+                return 0;
+              }
+              return t - 1;
+            });
+          }, 1000);
+          toast.success("OTP sent!");
+          setCanResend(false);
+          return;
+        }
       }
 
       toast.success("Profile updated successfully!");
@@ -189,6 +247,42 @@ const Profile = () => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleResendOtp = async () => {
+    if (!pendingEmail) return;
+    setCountdown(30);
+    setCanResend(false);
+    setOtp("");
+    setOtpError("");
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setCountdown((t) => {
+        if (t <= 1) {
+          clearInterval(intervalRef.current);
+          setCanResend(true);
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    await updateUser({ email: pendingEmail });
+  };
+
+  const handleOtpVerify = async () => {
+    const result = await verifyOtp({ email: pendingEmail, otp });
+    if ("error" in result) {
+      setOtpError("Incorrect OTP. Try again.");
+      return;
+    }
+    toast.success("Email updated successfully!");
+    setShowOtpDialog(false);
+    clearInterval(intervalRef.current);
+    setCanResend(false);
+    setOtp("");
+    setOtpError("");
+    setPendingEmail("");
+    refetch();
   };
 
   const switchTab = (tab) => {
@@ -422,6 +516,56 @@ const Profile = () => {
           </Card>
         )}
       </div>
+      <Dialog open={showOtpDialog} onOpenChange={setShowOtpDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enter OTP</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <InputOTP
+              maxLength={6}
+              value={otp}
+              onChange={(value) => {
+                const numeric = value.replace(/\D/g, "");
+                setOtp(numeric);
+                setOtpError("");
+              }}
+            >
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+              </InputOTPGroup>
+              <InputOTPSeparator />
+              <InputOTPGroup>
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+            <p className="text-sm text-gray-500">Time remaining: {countdown} seconds</p>
+            {otpError && <p className="text-red-500 text-sm">{otpError}</p>}
+          </div>
+          <DialogFooter>
+            <div className="flex-grow text-left">
+              <Button
+                variant="link"
+                onClick={handleResendOtp}
+                disabled={countdown > 0}
+                className="p-0 text-sm"
+              >
+                Resend OTP
+              </Button>
+            </div>
+            <Button variant="secondary" onClick={() => setShowOtpDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleOtpVerify} disabled={otpIsLoading || otp.length < 6}>
+              {otpIsLoading ? "Verifying…" : "Verify"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

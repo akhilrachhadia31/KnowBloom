@@ -63,7 +63,12 @@ export const register = async (req, res) => {
       });
 
     const otp = crypto.randomInt(100000, 999999).toString();
-    saveOtp(email, otp, { name, email, password });
+    saveOtp(email.toLowerCase(), otp, {
+      action: "register",
+      name,
+      email: email.toLowerCase(),
+      password,
+    });
     await sendOtpEmail(email, otp, name);
 
     return res.status(200).json({
@@ -85,28 +90,46 @@ export const verifyOtp = async (req, res) => {
     if (!record) {
       return res.status(400).json({
         success: false,
-        message: "OTP expired or invalid. Please sign up again.",
+        message: "OTP expired or invalid. Please try again.",
         field: "otp",
       });
     }
     if (record.otp !== otp) {
       return res.status(400).json({
         success: false,
-        message: "Incorrect OTP. Please sign up again.",
+        message: "Incorrect OTP. Please try again.",
         field: "otp",
       });
     }
-    const hashedPassword = await bcrypt.hash(record.data.password, 10);
-    await User.create({
-      name: record.data.name,
-      email: record.data.email,
-      password: hashedPassword,
-    });
-    deleteOtp(email.toLowerCase());
-    return res.status(201).json({
-      success: true,
-      message: "Account created successfully. Please log in.",
-    });
+
+    if (record.data.action === "updateEmail") {
+      const user = await User.findById(record.data.userId);
+      if (!user) {
+        deleteOtp(email.toLowerCase());
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found." });
+      }
+      user.email = record.data.newEmail;
+      await user.save();
+      deleteOtp(email.toLowerCase());
+      return res.status(200).json({
+        success: true,
+        message: "Email updated successfully.",
+      });
+    } else {
+      const hashedPassword = await bcrypt.hash(record.data.password, 10);
+      await User.create({
+        name: record.data.name,
+        email: record.data.email,
+        password: hashedPassword,
+      });
+      deleteOtp(email.toLowerCase());
+      return res.status(201).json({
+        success: true,
+        message: "Account created successfully. Please log in.",
+      });
+    }
   } catch (error) {
     console.error("Verify OTP Error:", error);
     return res.status(500).json({
@@ -245,6 +268,8 @@ export const updateProfile = async (req, res) => {
         .json({ success: false, message: "Page not found." });
 
     const updatedFields = {};
+    let emailChanged = false;
+    let pendingEmail = null;
 
     // change username
     if (name && name !== user.name) {
@@ -280,7 +305,15 @@ export const updateProfile = async (req, res) => {
           message: "Email is already in use.",
           field: "email",
         });
-      updatedFields.email = normalized;
+      const otp = crypto.randomInt(100000, 999999).toString();
+      saveOtp(normalized, otp, {
+        action: "updateEmail",
+        userId,
+        newEmail: normalized,
+      });
+      await sendOtpEmail(normalized, otp, user.name);
+      emailChanged = true;
+      pendingEmail = normalized;
     }
 
     // change role if provided
@@ -312,13 +345,28 @@ export const updateProfile = async (req, res) => {
     if (instagram !== undefined) updatedFields.instagram = instagram;
     if (twitter !== undefined) updatedFields.twitter = twitter;
 
+    let updatedUser = user;
     if (Object.keys(updatedFields).length > 0) {
-      const updated = await User.findByIdAndUpdate(userId, updatedFields, {
+      updatedUser = await User.findByIdAndUpdate(userId, updatedFields, {
         new: true,
       }).select("-password");
+    }
+
+    if (emailChanged) {
       return res.status(200).json({
         success: true,
-        user: updated,
+        user: updatedUser,
+        otpRequired: true,
+        message:
+          "OTP sent to your new email. Verify to complete the update.",
+        pendingEmail,
+      });
+    }
+
+    if (Object.keys(updatedFields).length > 0) {
+      return res.status(200).json({
+        success: true,
+        user: updatedUser,
         message: "Profile updated successfully.",
       });
     }
