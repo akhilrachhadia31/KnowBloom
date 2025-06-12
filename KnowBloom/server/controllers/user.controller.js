@@ -3,7 +3,6 @@ import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/generateToken.js";
 import { uploadMedia, deleteMediaFromCloudinary } from "../utils/cloudinary.js";
 import crypto from "crypto";
-import jwt from "jsonwebtoken";
 import { saveOtp, getOtpData, deleteOtp } from "../utils/otpStore.js";
 import { sendOtpEmail, sendPasswordResetEmail } from "../utils/email.js";
 import dotenv from "dotenv";

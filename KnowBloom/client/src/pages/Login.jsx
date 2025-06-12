@@ -128,52 +128,41 @@ const Login = () => {
    *   type === "login"  → call loginUser mutation (email/password), then clear cache+reload
    */
   const handleRegistration = async (type) => {
-    const inputData = type === "signup" ? signupInput : loginInput;
-    const action = type === "signup" ? registerUser : loginUser;
-    const payload = { ...inputData };
-
+    // shared for signup & login
     if (type === "signup" && !usernameRegex.test(signupInput.name)) {
-      setFieldErrors((prev) => ({
-        ...prev,
-        name: "Username must not contain special characters.",
-      }));
+      setFieldErrors((f) => ({ ...f, name: "Invalid username." }));
       return;
     }
-
+    const action = type === "signup" ? registerUser : loginUser;
+    const payload = type === "signup" ? signupInput : loginInput;
     const result = await action(payload);
 
     if ("error" in result) {
-      const field = result.error?.data?.field;
-      if (type === "signup" && field) {
-        setFieldErrors((prev) => ({
-          ...prev,
-          [field]: result.error.data.message,
-        }));
-      } else {
-        toast.error(result.error.data?.message || "Action failed");
-      }
-    } else if (type === "signup") {
-      setShowOtpInput(true);
-      setCanResend(false);
-      setCountdown(30);
-      toast.success("OTP sent to your email.");
-      setOtpError("");
+      toast.error(result.error.data?.message || "Something went wrong");
+      return;
+    }
 
-      if (intervalRef.current) clearInterval(intervalRef.current);
+    if (type === "signup") {
+      // show OTP dialog
+      setShowOtpInput(true);
+      setCountdown(30);
+      setOtpError("");
+      clearInterval(intervalRef.current);
       intervalRef.current = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
+        setCountdown((t) => {
+          if (t <= 1) {
             clearInterval(intervalRef.current);
-            setCanResend(true);
-            setOtpError("OTP expired. Please resend OTP.");
+            setOtpError("OTP expired");
             return 0;
           }
-          return prev - 1;
+          return t - 1;
         });
       }, 1000);
+      toast.success("OTP sent!");
     } else {
+      // login → reset RTK state, redirect
       dispatch(authApi.util.resetApiState());
-      toast.success("Login successful");
+      toast.success("Logged in!");
       window.location.href = "/";
     }
   };
@@ -188,6 +177,7 @@ const Login = () => {
   const handleOtpVerify = async () => {
     const result = await verifyOtp({ email: signupInput.email, otp });
     if ("error" in result) {
+      // Show error, but do NOT clear the interval or enable resend
       setOtpError("Incorrect OTP. Try again.");
       return;
     }

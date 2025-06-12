@@ -13,14 +13,16 @@ const isAuthenticated = (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    if (!decoded?.userId) {
+    // Support tokens that store either { id } or { userId }
+    const userId = decoded.id || decoded.userId;
+    if (!userId) {
       return res.status(401).json({
         message: "Invalid token structure.",
         success: false,
       });
     }
 
-    req.id = decoded.userId; // Attach userId to request
+    req.id = userId; // Attach the user id to request
     next();
   } catch (error) {
     console.error("Authentication error:", error.message);

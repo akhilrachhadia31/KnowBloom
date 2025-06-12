@@ -1,16 +1,14 @@
 import path from "path";
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
+// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-  },
-  base: "/", // important for correct asset paths on Render
-  server: {
-    historyApiFallback: true, // fallback for SPA routing on dev server
   },
 });

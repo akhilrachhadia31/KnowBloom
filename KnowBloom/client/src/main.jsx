@@ -10,7 +10,7 @@ import { useLoadUserQuery } from "./features/api/authApi";
 import LoadingSpinner from "./components/LoadingSpinner";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { UserContext } from "./context/UserContext";
-import Logo from "./components/Logo";
+import Logo from "./components/logo";
 import LoadingScreen from "./loadingscreen";
 
 const GOOGLE_CLIENT_ID =
