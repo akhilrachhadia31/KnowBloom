@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import LoadingScreen from "@/loadingscreen";
 
 const StatCard = ({ title, value }) => (
   <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow text-center transition-colors">
@@ -170,7 +171,7 @@ export default function CourseInsights() {
       </div>
 
       {isLoading ? (
-        <p className="text-gray-600 dark:text-gray-300">Loading insights...</p>
+         <LoadingScreen />
       ) : (
         <>
           {/* Stats */}
