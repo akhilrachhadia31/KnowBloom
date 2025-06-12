@@ -67,15 +67,8 @@ const Dashboard = () => {
       maximumFractionDigits: 0,
     }).format(value);
 
-  // Early returns BELOW all hooks
-<<<<<<< HEAD
+// Early returns BELOW all hooks
   if (isLoading) return <LoadingScreen />;
-=======
-  if (isLoading)
-    return (
-      <LoadingScreen/>
-    );
->>>>>>> e0bb359b91c4b7263b1c50098be3c68aee652981
   if (isError)
     return (
       <div className="text-red-500 dark:text-red-400">
