@@ -12,13 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
   InputOTPSeparator,
 } from "@/components/ui/input-otp";
+import { Separator } from "@/components/ui/separator";
 import {
   useLoadUserQuery,
   useUpdateUserMutation,
@@ -473,6 +473,12 @@ const Profile = () => {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+
+              <Button className="mt-4" onClick={handlePasswordChange}>
+                Update Password
+              </Button>
+            </div>
+
           </Card>
         )}
       </div>
