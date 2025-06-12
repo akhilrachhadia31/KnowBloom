@@ -3,10 +3,6 @@ import React from "react";
 import { useTheme } from "./components/ThemeProvider";
 import { Sun, Moon } from "lucide-react";
 
-const themes = ["light", "dark", "system"];
-const getNextTheme = (current) =>
-  themes[(themes.indexOf(current) + 1) % themes.length];
-
 const useCurrentThemeClass = () => {
   const [current, setCurrent] = React.useState(() =>
     document.documentElement.classList.contains("dark") ? "dark" : "light"
@@ -31,12 +27,11 @@ const useCurrentThemeClass = () => {
 };
 
 const DarkModeToggle = () => {
-  const { theme, setTheme } = useTheme();
+  const { setTheme } = useTheme();
   const actualTheme = useCurrentThemeClass();
 
   const handleToggle = () => {
-    const nextTheme = getNextTheme(theme);
-    setTheme(nextTheme);
+    setTheme(actualTheme === "dark" ? "light" : "dark");
   };
 
   return (
