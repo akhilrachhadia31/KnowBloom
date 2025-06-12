@@ -5,15 +5,20 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+  InputOTPSeparator,
+} from "@/components/ui/input-otp";
 import {
   useLoadUserQuery,
   useUpdateUserMutation,
@@ -38,7 +43,6 @@ const Profile = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
   const [updatePasswordUser] = useUpdatePasswordUserMutation();
   const [formError, setFormError] = useState("");
@@ -47,6 +51,8 @@ const Profile = () => {
   const [fadeTransition, setFadeTransition] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [currentPasswordValid, setCurrentPasswordValid] = useState(null);
+  const [otpDialogOpen, setOtpDialogOpen] = useState(false);
+  const [otp, setOtp] = useState("");
 
   const { data, isLoading, refetch } = useLoadUserQuery();
   const [updateUser] = useUpdateUserMutation();
@@ -116,7 +122,6 @@ const Profile = () => {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setIsPasswordDialogOpen(false);
       refetch(); // Refresh user data
     } catch (error) {
       setPasswordError(
@@ -415,10 +420,59 @@ const Profile = () => {
             )}
             {/* Update button: right-aligned */}
             <div className="flex justify-end">
-              <Button className="mt-4" onClick={handlePasswordChange}>
+              <Button className="mt-4" onClick={() => setOtpDialogOpen(true)}>
                 Update Password
               </Button>
             </div>
+
+            <Dialog open={otpDialogOpen} onOpenChange={setOtpDialogOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Enter OTP</DialogTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Please enter the 6-digit code sent to your email to
+                    confirm password change.
+                  </p>
+                </DialogHeader>
+                <div className="space-y-2">
+                  <InputOTP
+                    maxLength={6}
+                    value={otp}
+                    onChange={(val) => setOtp(val.replace(/\D/g, ""))}
+                  >
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2} />
+                    </InputOTPGroup>
+                    <InputOTPSeparator />
+                    <InputOTPGroup>
+                      <InputOTPSlot index={3} />
+                      <InputOTPSlot index={4} />
+                      <InputOTPSlot index={5} />
+                    </InputOTPGroup>
+                  </InputOTP>
+                </div>
+                <DialogFooter>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setOtpDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setOtpDialogOpen(false);
+                      handlePasswordChange();
+                      setOtp("");
+                    }}
+                    disabled={otp.trim().length < 6}
+                  >
+                    Verify OTP
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </Card>
         )}
       </div>
