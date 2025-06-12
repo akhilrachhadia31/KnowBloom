@@ -33,11 +33,7 @@ app.use(
 // 🌍 CORS (must be above all routes)
 app.use(
   cors({
-<<<<<<< HEAD
     origin: "https://knowbloom.onrender.com",
-=======
-    origin: "https://knowbloom.onrender.com", // frontend domain
->>>>>>> e0bb359b91c4b7263b1c50098be3c68aee652981
     credentials: true,
   })
 );
