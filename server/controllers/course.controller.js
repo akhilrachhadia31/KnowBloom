@@ -3,6 +3,7 @@ import { Lecture } from "../models/lecture.model.js";
 import { Module } from "../models/module.model.js";
 import { User } from "../models/user.model.js";
 import { Review } from "../models/course.model.js";
+import logger from "../utils/logger.js";
 import { CoursePurchase } from "../models/coursePurchase.model.js";
 import { CourseProgress } from "../models/courseProgress.model.js";
 import {
@@ -60,7 +61,7 @@ export const createCourse = async (req, res) => {
       message: "Course created.",
     });
   } catch (error) {
-    console.error(error);
+     logger.error(error);
     if (
       error.code === 11000 &&
       error.keyPattern &&
@@ -106,7 +107,7 @@ export const searchCourse = async (req, res) => {
       courses: courses || [],
     });
   } catch (error) {
-    console.error(error);
+     logger.error(error);
     return res.status(500).json({
       message: "Server error during search",
     });
@@ -124,7 +125,7 @@ export const getPublishedCourse = async (_, res) => {
     }
     return res.status(200).json({ courses });
   } catch (error) {
-    console.error(error);
+     logger.error(error);
     return res.status(500).json({ message: "Failed to get published courses" });
   }
 };
@@ -157,7 +158,7 @@ export const getCreatorCourses = async (req, res) => {
     }
     return res.status(200).json({ courses });
   } catch (error) {
-    console.error(error);
+     logger.error(error);
     return res
       .status(500)
       .json({ message: "Failed to fetch creator's courses" });
@@ -178,7 +179,7 @@ export const getMyLearningCourses = async (req, res) => {
 
     return res.status(200).json({ courses });
   } catch (error) {
-    console.error(error);
+     logger.error(error);
     return res.status(500).json({ message: "Failed to get purchased courses" });
   }
 };
@@ -247,7 +248,7 @@ export const editCourse = async (req, res) => {
       message: "Course updated successfully.",
     });
   } catch (error) {
-    console.error(error);
+     logger.error(error);
     if (
       error.code === 11000 &&
       error.keyPattern &&
@@ -274,7 +275,7 @@ export const getCourseById = async (req, res) => {
     }
     return res.status(200).json({ course });
   } catch (error) {
-    console.error(error);
+     logger.error(error);
     return res.status(500).json({ message: "Failed to get course by id" });
   }
 };
@@ -332,7 +333,7 @@ export const createLecture = async (req, res) => {
       message: "Lecture created successfully.",
     });
   } catch (error) {
-    console.error("createLecture error:", error);
+     logger.error("createLecture error:", error);
     return res.status(500).json({ message: "Failed to create lecture" });
   }
 };
@@ -347,7 +348,7 @@ export const getCourseLecture = async (req, res) => {
     }
     return res.status(200).json({ lectures: course.lectures });
   } catch (error) {
-    console.error(error);
+     logger.error(error);
     return res.status(500).json({ message: "Failed to get lectures" });
   }
 };
@@ -377,7 +378,7 @@ export const removeLectureVideo = async (req, res) => {
       message: "Video removed successfully.",
     });
   } catch (error) {
-    console.error("[removeLectureVideo] Error:", error);
+     logger.error("[removeLectureVideo] Error:", error);
     return res
       .status(500)
       .json({ message: "Failed to remove video from lecture." });
@@ -404,7 +405,7 @@ export const removeLecture = async (req, res) => {
 
     return res.status(200).json({ message: "Lecture removed successfully." });
   } catch (error) {
-    console.error(error);
+     logger.error(error);
     return res.status(500).json({ message: "Failed to remove lecture" });
   }
 };
@@ -419,7 +420,7 @@ export const getLectureById = async (req, res) => {
     }
     return res.status(200).json({ lecture });
   } catch (error) {
-    console.error(error);
+     logger.error(error);
     return res.status(500).json({ message: "Failed to get lecture by id" });
   }
 };
@@ -480,7 +481,7 @@ export const togglePublishCourse = async (req, res) => {
       message: `Course is now ${newStatus ? "Published" : "Draft"}`,
     });
   } catch (error) {
-    console.error("togglePublishCourse error:", error);
+     logger.error("togglePublishCourse error:", error);
     return res.status(500).json({ message: "Failed to update publish status" });
   }
 };
@@ -552,7 +553,7 @@ export const deleteCourse = async (req, res) => {
         "Course deleted, along with all related lectures, modules, purchases, progress, user enrollments, and reviews.",
     });
   } catch (error) {
-    console.error(error);
+     logger.error(error);
     return res.status(500).json({ message: "Failed to delete course" });
   }
 };
@@ -628,7 +629,7 @@ export const getCourseDetail = async (req, res) => {
 
     return res.status(200).json({ course });
   } catch (error) {
-    console.error(error);
+     logger.error(error);
     return res.status(500).json({ message: "Failed to fetch course details" });
   }
 };
@@ -678,7 +679,7 @@ export const getCoursesByCreator = async (req, res) => {
       courses,
     });
   } catch (error) {
-    console.error("Error in getCoursesByCreator:", error);
+     logger.error("Error in getCoursesByCreator:", error);
     return res.status(500).json({
       success: false,
       message: "Server error fetching courses by creator.",
@@ -740,7 +741,7 @@ export const setLectureQuiz = async (req, res) => {
       .status(200)
       .json({ lecture, message: "Quiz saved successfully." });
   } catch (error) {
-    console.error("setLectureQuiz error:", error);
+     logger.error("setLectureQuiz error:", error);
     return res.status(500).json({ message: "Failed to set quiz." });
   }
 };
@@ -765,7 +766,7 @@ export const getLectureQuiz = async (req, res) => {
     // Return `{ quiz: lecture.quiz }` (or `null` if no quiz yet)
     return res.status(200).json({ quiz: lecture.quiz || null });
   } catch (error) {
-    console.error("getLectureQuiz error:", error);
+     logger.error("getLectureQuiz error:", error);
     return res.status(500).json({ message: "Failed to get quiz." });
   }
 };
@@ -792,7 +793,7 @@ export const removeLectureQuiz = async (req, res) => {
     // 4) 204: no content
     return res.sendStatus(204);
   } catch (err) {
-    console.error("removeLectureQuiz error:", err);
+     logger.error("removeLectureQuiz error:", err);
     return res.status(500).json({ message: "Failed to remove quiz" });
   }
 };
@@ -850,7 +851,7 @@ export const getCourseStudents = async (req, res) => {
 
     return res.status(200).json({ students });
   } catch (error) {
-    console.error("getCourseStudents error:", error);
+     logger.error("getCourseStudents error:", error);
     return res
       .status(500)
       .json({ message: "Failed to fetch students for this course." });
@@ -886,7 +887,7 @@ export const removeStudent = async (req, res) => {
     await course.save();
     return res.status(200).json({ message: "Student removed from course." });
   } catch (err) {
-    console.error("removeStudent error:", err);
+     logger.error("removeStudent error:", err);
     return res.status(500).json({ message: "Failed to remove." });
   }
 };
@@ -916,7 +917,7 @@ export const sendCourseInfo = async (req, res) => {
           });
           return { email: stu.email, success: true };
         } catch (err) {
-          console.error(`Error sending to ${stu.email}:`, err);
+           logger.error(`Error sending to ${stu.email}:`, err);
           return { email: stu.email, success: false, error: err.message };
         }
       })
@@ -937,7 +938,7 @@ export const sendCourseInfo = async (req, res) => {
       errors: failed,
     });
   } catch (err) {
-    console.error("sendCourseInfo unhandled error:", err);
+     logger.error("sendCourseInfo unhandled error:", err);
     return res.status(500).json({ message: "Failed to send course emails." });
   }
 };
@@ -951,7 +952,7 @@ export const getCourseReviews = async (req, res) => {
 
     return res.status(200).json({ success: true, reviews });
   } catch (err) {
-    console.error("getCourseReviews error:", err);
+     logger.error("getCourseReviews error:", err);
     return res.status(500).json({ message: "Failed to fetch reviews." });
   }
 };
@@ -979,7 +980,7 @@ export const createReview = async (req, res) => {
     });
     return res.status(201).json({ success: true, review });
   } catch (err) {
-    console.error("createReview error:", err);
+     logger.error("createReview error:", err);
     return res.status(500).json({ message: "Failed to submit review." });
   }
 };
@@ -999,7 +1000,7 @@ export const updateReview = async (req, res) => {
 
     return res.status(200).json({ success: true, review });
   } catch (err) {
-    console.error("updateReview error:", err);
+     logger.error("updateReview error:", err);
     return res.status(500).json({ message: "Failed to update review." });
   }
 };

@@ -7,6 +7,7 @@ import { saveOtp, getOtpData, deleteOtp } from "../utils/otpStore.js";
 import { sendOtpEmail, sendPasswordResetEmail } from "../utils/email.js";
 import dotenv from "dotenv";
 dotenv.config();
+import logger from "../utils/logger.js";
 
 export const register = async (req, res) => {
   try {
@@ -71,7 +72,7 @@ export const register = async (req, res) => {
       message: "OTP sent to your email. Please verify.",
     });
   } catch (error) {
-    console.error("Register Error:", error);
+     logger.error("Register Error:", error);
     return res
       .status(500)
       .json({ success: false, message: "Failed to register." });
@@ -108,7 +109,7 @@ export const verifyOtp = async (req, res) => {
       message: "Account created successfully. Please log in.",
     });
   } catch (error) {
-    console.error("Verify OTP Error:", error);
+     logger.error("Verify OTP Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to verify OTP. Please try again.",
@@ -169,7 +170,7 @@ export const login = async (req, res) => {
     }
     generateToken(res, user, `Welcome ${user.name}`);
   } catch (error) {
-    console.error("Login Error:", error);
+     logger.error("Login Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to login.",
@@ -192,7 +193,7 @@ export const logout = async (_, res) => {
         success: true,
       });
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return res.status(500).json({
       success: false,
       message: "Failed to logout",
@@ -216,7 +217,7 @@ export const getUserProfile = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.error(error);
+     logger.error(error);
     return res.status(500).json({
       success: false,
       message: "Failed to load user.",
@@ -355,7 +356,7 @@ export const updateProfile = async (req, res) => {
 
     return res.json({ success: true, message: "No changes made." });
   } catch (error) {
-    console.error("UpdateProfile Error:", error);
+     logger.error("UpdateProfile Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to update profile.",
@@ -394,7 +395,7 @@ export const checkCurrentPassword = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Password check error:", error.message);
+     logger.error("Password check error:", error.message);
     return res.status(500).json({
       success: false,
       message: "Server error while checking password.",
@@ -428,7 +429,7 @@ export const updatePassword = async (req, res) => {
       message: "Password updated successfully.",
     });
   } catch (error) {
-    console.error("Update password error:", error);
+     logger.error("Update password error:", error);
     return res
       .status(500)
       .json({ success: false, message: "Failed to update password." });
@@ -466,7 +467,7 @@ export const verifyEmailChange = async (req, res) => {
 
     return res.json({ success: true, message: "Email updated successfully." });
   } catch (error) {
-    console.error("Verify email change error:", error);
+     logger.error("Verify email change error:", error);
     return res
       .status(500)
       .json({ success: false, message: "Failed to verify OTP." });
@@ -510,7 +511,7 @@ export const forgotPassword = async (req, res) => {
       message: "A password reset link has been sent to your email.",
     });
   } catch (error) {
-    console.error("Forgot password error:", error);
+     logger.error("Forgot password error:", error);
     return res
       .status(500)
       .json({ success: false, message: "Failed to send reset link." });
@@ -547,7 +548,7 @@ export const resetPassword = async (req, res) => {
       message: "Password has been reset successfully!",
     });
   } catch (error) {
-    console.error("Reset password error:", error);
+     logger.error("Reset password error:", error);
     return res
       .status(500)
       .json({ success: false, message: "Failed to reset password." });
@@ -565,7 +566,7 @@ export const getUserByUsername = async (req, res) => {
     }
     return res.json({ success: true, user });
   } catch (err) {
-    console.error(err);
+     logger.error(err);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -596,7 +597,7 @@ export const getInstructorById = async (req, res) => {
       instagram: user.instagram ?? "",
     });
   } catch (err) {
-    console.error("Error in getInstructorById:", err);
+     logger.error("Error in getInstructorById:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

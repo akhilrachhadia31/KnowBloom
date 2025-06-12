@@ -3,6 +3,7 @@
 import { CourseProgress } from "../models/courseProgress.model.js";
 import { Course } from "../models/course.model.js";
 import mongoose from "mongoose";
+import logger from "../utils/logger.js";
 
 /**
  * Sync per-user lecture counts into Course.studentsEnrolled sub-document.
@@ -124,7 +125,7 @@ export const getCourseProgress = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(err);
+     logger.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 };
@@ -178,12 +179,12 @@ export const updateLectureProgress = async (req, res) => {
     try {
       await syncEnrollmentStats(courseId, userId, viewedCount, totalLectures);
     } catch (syncErr) {
-      console.error("syncEnrollmentStats failed:", syncErr);
+       logger.error("syncEnrollmentStats failed:", syncErr);
     }
 
     return res.status(200).json({ message: "Lecture marked viewed." });
   } catch (err) {
-    console.error(err);
+     logger.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 };
@@ -229,12 +230,12 @@ export const unviewLectureProgress = async (req, res) => {
     try {
       await syncEnrollmentStats(courseId, userId, viewedCount, totalLectures);
     } catch (syncErr) {
-      console.error("syncEnrollmentStats failed:", syncErr);
+       logger.error("syncEnrollmentStats failed:", syncErr);
     }
 
     return res.status(200).json({ message: "Lecture marked unviewed." });
   } catch (err) {
-    console.error(err);
+     logger.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 };
@@ -279,7 +280,7 @@ export const markAsCompleted = async (req, res) => {
 
     return res.status(200).json({ message: "Course marked completed." });
   } catch (err) {
-    console.error(err);
+     logger.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 };
@@ -316,7 +317,7 @@ export const markAsInCompleted = async (req, res) => {
 
     return res.status(200).json({ message: "Course marked incomplete." });
   } catch (err) {
-    console.error(err);
+     logger.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 };

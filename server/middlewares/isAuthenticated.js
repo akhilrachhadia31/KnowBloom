@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
+import logger from "../utils/logger.js";
 
 const isAuthenticated = (req, res, next) => {
   try {
@@ -25,7 +26,7 @@ const isAuthenticated = (req, res, next) => {
     req.id = userId; // Attach the user id to request
     next();
   } catch (error) {
-    console.error("Authentication error:", error.message);
+    logger.error({ message: error.message }, "Authentication error");
     return res.status(401).json({
       message: "Invalid or expired token.",
       success: false,

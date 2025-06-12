@@ -4,6 +4,7 @@ import { Course } from "../models/course.model.js";
 import { Module } from "../models/module.model.js";
 import { Lecture } from "../models/lecture.model.js";
 import { deleteVideoFromCloudinary } from "../utils/cloudinary.js";
+import logger from "../utils/logger.js";
 
 // ─────────── IMPORTANT: import your Cloudinary SDK/configuration here ───────────
 import cloudinary from "cloudinary";
@@ -30,7 +31,7 @@ export const createModule = async (req, res) => {
       .status(201)
       .json({ module, message: "Module created successfully." });
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return res.status(500).json({ message: "Failed to create module" });
   }
 };
@@ -42,7 +43,7 @@ export const getCourseModules = async (req, res) => {
     if (!course) return res.status(404).json({ message: "Course not found" });
     return res.status(200).json({ modules: course.modules });
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return res.status(500).json({ message: "Failed to get modules" });
   }
 };
@@ -54,7 +55,7 @@ export const getModuleById = async (req, res) => {
     if (!module) return res.status(404).json({ message: "Module not found" });
     return res.status(200).json({ module });
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return res.status(500).json({ message: "Failed to get module" });
   }
 };
@@ -73,7 +74,7 @@ export const editModule = async (req, res) => {
       .status(200)
       .json({ module, message: "Module updated successfully." });
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return res.status(500).json({ message: "Failed to update module" });
   }
 };
@@ -103,7 +104,7 @@ export const removeModule = async (req, res) => {
 
     return res.status(200).json({ message: "Module deleted successfully." });
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return res.status(500).json({ message: "Failed to delete module" });
   }
 };
@@ -137,7 +138,7 @@ export const createModuleLecture = async (req, res) => {
       .status(201)
       .json({ lecture, message: "Lecture created successfully." });
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return res.status(500).json({ message: "Failed to create lecture" });
   }
 };
@@ -149,14 +150,17 @@ export const getModuleLectures = async (req, res) => {
     if (!module) return res.status(404).json({ message: "Module not found" });
     return res.status(200).json({ lectures: module.lectures });
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return res.status(500).json({ message: "Failed to get lectures" });
   }
 };
 
 export const editModuleLecture = async (req, res) => {
-  // ── console.log the entire body for debugging
-  console.log("editModuleLecture(req.body) =", JSON.stringify(req.body));
+  // Log entire body for debugging
+  logger.debug(
+    { body: req.body },
+    "editModuleLecture request body"
+  );
 
   try {
     const { lectureTitle, videoInfo, preview } = req.body;
@@ -213,7 +217,7 @@ export const editModuleLecture = async (req, res) => {
       .status(200)
       .json({ lecture, message: "Lecture updated successfully." });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     return res.status(500).json({ message: "Failed to update lecture" });
   }
 };
@@ -248,7 +252,7 @@ export const removeModuleLecture = async (req, res) => {
 
     return res.status(200).json({ message: "Lecture removed successfully." });
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return res.status(500).json({ message: "Failed to remove lecture" });
   }
 };
@@ -273,7 +277,7 @@ export const getModuleLectureVideoInfo = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     return res.status(500).json({ message: "Failed to fetch video-info." });
   }
 };

@@ -14,6 +14,7 @@ import session from "express-session";
 import helmet from "helmet";
 import "./passport.js";
 import history from "connect-history-api-fallback";
+import logger from "./utils/logger.js";
 
 dotenv.config();
 connectDB();
@@ -63,7 +64,7 @@ app.use(passport.session());
 
 // 🧪 Log request origin (for debugging)
 app.use((req, res, next) => {
-  console.log("Request Origin:", req.headers.origin);
+  logger.debug({ origin: req.headers.origin }, "Request Origin");
   next();
 });
 
@@ -91,7 +92,7 @@ app.use(express.static(path.join(__dirname, "../client/dist")));
 
 // ❌ Error handler
 app.use((err, req, res, next) => {
-  console.error("Global error handler:", err.stack);
+  logger.error({ err }, "Global error handler");
   res.status(500).json({ message: "Something went wrong!" });
 });
 
@@ -102,5 +103,5 @@ app.use((req, res) => {
 
 // 🚀 Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at port ${PORT}`);
+  logger.info(`🚀 Server running at port ${PORT}`);
 });

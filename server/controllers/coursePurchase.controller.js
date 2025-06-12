@@ -8,12 +8,13 @@ import { User } from "../models/user.model.js";
 import dotenv from "dotenv";
 import { Module } from "../models/module.model.js";
 import { sendPurchaseConfirmationEmail } from "../utils/email.js";
+import logger from "../utils/logger.js";
 
 dotenv.config();
 
 // Ensure STRIPE_SECRET_KEY is provided
 if (!process.env.STRIPE_SECRET_KEY) {
-  console.error("⚠️ STRIPE_SECRET_KEY is not defined in your .env!");
+  logger.error("⚠️ STRIPE_SECRET_KEY is not defined in your .env!");
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -41,7 +42,7 @@ export const createCheckoutSession = async (req, res) => {
     // 2) Ensure price is a valid number
     const priceRupees = Number(course.coursePrice || 0);
     if (isNaN(priceRupees)) {
-      console.warn(
+      logger.warn(
         `Warning: course.coursePrice is not a number for courseId=${courseId}. Defaulting to 0.`
       );
     }
@@ -75,7 +76,7 @@ export const createCheckoutSession = async (req, res) => {
     });
 
     if (!session || !session.id || !session.url) {
-      console.error("Stripe session creation failed:", session);
+      logger.error({ session }, "Stripe session creation failed");
       return res
         .status(500)
         .json({ message: "Stripe session did not return a valid URL." });
@@ -97,7 +98,7 @@ export const createCheckoutSession = async (req, res) => {
       url: session.url,
     });
   } catch (error) {
-    console.error("createCheckoutSession error:", error);
+    logger.error({ error }, "createCheckoutSession error");
     return res
       .status(500)
       .json({ message: error.message || "Internal Server Error" });
@@ -116,7 +117,7 @@ export const stripeWebhook = async (req, res) => {
     const payloadString = JSON.stringify(req.body, null, 2);
     const secret = process.env.WEBHOOK_ENDPOINT_SECRET;
     if (!secret) {
-      console.error("⚠️ WEBHOOK_ENDPOINT_SECRET is not set in .env!");
+      logger.error("⚠️ WEBHOOK_ENDPOINT_SECRET is not set in .env!");
       return res.status(400).send("Webhook secret not configured");
     }
     const header = stripe.webhooks.generateTestHeaderString({
@@ -125,13 +126,13 @@ export const stripeWebhook = async (req, res) => {
     });
     event = stripe.webhooks.constructEvent(payloadString, header, secret);
   } catch (error) {
-    console.error("stripeWebhook signature error:", error.message);
+    logger.error({ error: error.message }, "stripeWebhook signature error");
     return res.status(400).send(`Webhook Error: ${error.message}`);
   }
 
   // Only handle checkout.session.completed
   if (event.type === "checkout.session.completed") {
-    console.log("stripeWebhook: checkout.session.completed");
+    logger.info("stripeWebhook: checkout.session.completed");
 
     try {
       const session = event.data.object;
@@ -140,7 +141,7 @@ export const stripeWebhook = async (req, res) => {
       }).populate({ path: "courseId" });
 
       if (!purchase) {
-        console.warn("purchase not found for paymentId:", session.id);
+        logger.warn(`purchase not found for paymentId: ${session.id}`);
         return res.status(404).json({ message: "Purchase not found" });
       }
 
@@ -195,19 +196,22 @@ export const stripeWebhook = async (req, res) => {
             invoiceNumber,
             purchaseDate,
           });
-          console.log(`Purchase email sent to ${toEmail}`);
+          logger.info(`Purchase email sent to ${toEmail}`);
         } else {
-          console.warn(
+          logger.warn(
             "Page not found or missing email; cannot send invoice email."
           );
         }
       } catch (emailError) {
-        console.error("Error sending purchase confirmation email:", emailError);
-        // Do NOT fail the entire webhook if email sending fails—just log it.
+        logger.error(
+          { error: emailError },
+          "Error sending purchase confirmation email"
+        );
+      // Do NOT fail the entire webhook if email sending fails—just log it.
       }
       // --- END NEW EMAIL BLOCK ---
     } catch (error) {
-      console.error("stripeWebhook event handling error:", error);
+      logger.error({ error }, "stripeWebhook event handling error");
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -224,7 +228,7 @@ export const getCourseDetailWithPurchaseStatus = async (req, res) => {
   try {
     const { courseId } = req.params;
     const userId = req.id;
-    console.log("Requested courseId:", courseId, "by userId:", userId);
+    logger.debug({ courseId, userId }, "Requested course detail");
 
     // 1. Fetch course document (with creator info)
     const courseDoc = await Course.findById(courseId)
@@ -232,7 +236,7 @@ export const getCourseDetailWithPurchaseStatus = async (req, res) => {
       .lean();
 
     if (!courseDoc) {
-      console.log("Course not found!");
+      logger.warn("Course not found!");
       return res.status(404).json({ message: "Course not found!" });
     }
 
@@ -246,7 +250,7 @@ export const getCourseDetailWithPurchaseStatus = async (req, res) => {
         })
         .lean();
     } catch (err) {
-      console.log("Error populating modules/lectures:", err);
+      logger.error({ err }, "Error populating modules/lectures");
       modules = [];
     }
 
@@ -261,7 +265,7 @@ export const getCourseDetailWithPurchaseStatus = async (req, res) => {
           .lean();
       }
     } catch (err) {
-      console.log("Error fetching legacy lectures:", err);
+      logger.error({ err }, "Error fetching legacy lectures");
       legacyLectureDocs = [];
     }
 
@@ -284,7 +288,7 @@ export const getCourseDetailWithPurchaseStatus = async (req, res) => {
         status: "completed",
       });
     } catch (err) {
-      console.log("Error counting enrollments:", err);
+      logger.error({ err }, "Error counting enrollments");
       enrolledCount = 0;
     }
 
@@ -330,7 +334,7 @@ export const getCourseDetailWithPurchaseStatus = async (req, res) => {
 
     return res.status(200).json({ course, purchased, isCreator });
   } catch (error) {
-    console.error("getCourseDetailWithPurchaseStatus ERROR:", error);
+    logger.error({ error }, "getCourseDetailWithPurchaseStatus ERROR");
     return res.status(500).json({
       message: "Failed to fetch course details",
       error: error?.message,
@@ -351,7 +355,7 @@ export const getAllPurchasedCourse = async (_, res) => {
       purchasedCourse: purchasedCourse || [],
     });
   } catch (error) {
-    console.error("getAllPurchasedCourse error:", error);
+    logger.error({ error }, "getAllPurchasedCourse error");
     return res
       .status(500)
       .json({ message: error.message || "Failed to fetch purchased courses" });
