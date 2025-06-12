@@ -34,5 +34,8 @@
     "passport-google-oauth20": "^2.0.0",
     "pdfkit": "^0.17.1",
     "stripe": "^18.2.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
