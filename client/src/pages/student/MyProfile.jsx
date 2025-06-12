@@ -5,13 +5,16 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 import {
   useLoadUserQuery,
@@ -37,6 +40,7 @@ const Profile = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
   const [updatePasswordUser] = useUpdatePasswordUserMutation();
   const [formError, setFormError] = useState("");
@@ -71,26 +75,7 @@ const Profile = () => {
       setRemoveStatus("idle");
     }
   };
-
-  const validateCurrentPassword = async () => {
-    if (currentPassword.trim().length < 4) {
-      setCurrentPasswordValid(null);
-      return;
-    }
-    try {
-      const res = await checkPassword({ currentPassword }).unwrap();
-      if (res.success) {
-        setCurrentPasswordValid(true);
-        setIsPasswordInvalid(false);
-      } else {
-        setCurrentPasswordValid(false);
-        setIsPasswordInvalid(true);
-      }
-    } catch (error) {
-      setCurrentPasswordValid(false);
-      setIsPasswordInvalid(true);
-    }
-  };
+ const Profile = () => {
 
   useEffect(() => {
     if (currentPassword) validateCurrentPassword();
@@ -116,6 +101,7 @@ const Profile = () => {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
+      setIsPasswordDialogOpen(false);
       refetch(); // Refresh user data
     } catch (error) {
       setPasswordError(
@@ -141,254 +127,7 @@ const Profile = () => {
 
     if (!nameChanged && !emailChanged && !photoChanged && !newFieldsChanged) {
       toast.info("No changes detected.");
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-      setFormError("");
-
-      let payload;
-
-      if (photoChanged) {
-        payload = new FormData();
-        payload.append("name", name);
-        payload.append("email", email);
-        payload.append("biography", biography);
-        payload.append("linkedin", linkedin);
-        payload.append("instagram", instagram);
-        payload.append("twitter", twitter);
-        if (removeStatus === "removing") {
-          payload.append("removePhoto", "true");
-        } else {
-          payload.append("profilePhoto", profilePhoto);
-        }
-        await updateUser(payload).unwrap();
-      } else {
-        payload = {
-          name,
-          email,
-          biography,
-          linkedin,
-          instagram,
-          twitter,
-        };
-        await updateUser(payload).unwrap();
-      }
-
-      toast.success("Profile updated successfully!");
-      setProfilePhoto(null);
-      setRemoveStatus("idle");
-      refetch(); // Refresh user data
-    } catch (err) {
-      const message =
-        err?.data?.message || err?.error || "An unexpected error occurred.";
-      setFormError(message);
-      toast.error(message);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const switchTab = (tab) => {
-    setFadeTransition(true);
-    setTimeout(() => {
-      setActiveTab(tab);
-      setFadeTransition(false);
-    }, 300);
-  };
-
-  const user = data?.user;
-  const photoUrl = user?.photoUrl;
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-20">
-       
-      </div>
-    );
-  }
-
-  return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
-      <h1 className="text-3xl font-bold text-center sm:text-left mb-4">
-        Profile & Settings
-      </h1>
-      {/* Tabs: left-aligned and spaced */}
-      <div className="flex justify-start gap-4 mb-4">
-        {["profile", "photo", "password"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => switchTab(tab)}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              activeTab === tab
-                ? "bg-blue-600 text-white shadow-md"
-                : "bg-gray-100 text-gray-700 hover:bg-blue-100"
-            } transition-all duration-300`}
-          >
-            {tab === "profile" && "Profile Details"}
-            {tab === "photo" && "Profile Picture"}
-            {tab === "password" && "Password"}
-          </button>
-        ))}
-      </div>
-      <div
-        className={`transition-all duration-500 ${
-          fadeTransition ? "opacity-0 scale-95" : "opacity-100 scale-100"
-        }`}
-      >
-        {activeTab === "profile" && (
-          <Card className="p-6 space-y-4 shadow-lg rounded-xl">
-            <h2 className="text-xl font-semibold mb-1">Profile Details</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label>Username</Label>
-                <Input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your name"
-                />
-              </div>
-              <div>
-                <Label>Email</Label>
-                <Input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <Label>Biography</Label>
-                <textarea
-                  value={biography}
-                  onChange={(e) => setBiography(e.target.value)}
-                  placeholder="Write a short biography"
-                  className="w-full border rounded-md"
-                  rows={4}
-                />
-              </div>
-              <div>
-                <Label>LinkedIn</Label>
-                <Input
-                  placeholder="LinkedIn profile URL"
-                  value={linkedin}
-                  onChange={(e) => setLinkedin(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label>Instagram</Label>
-                <Input
-                  value={instagram}
-                  onChange={(e) => setInstagram(e.target.value)}
-                  placeholder="Instagram handle"
-                />
-              </div>
-              <div>
-                <Label>Twitter</Label>
-                <Input
-                  value={twitter}
-                  onChange={(e) => setTwitter(e.target.value)}
-                  placeholder="Twitter handle"
-                />
-              </div>
-            </div>
-            {/* Save button: right-aligned */}
-            <div className="mt-2 flex justify-end">
-              <Button
-                onClick={updateUserHandler}
-                disabled={isSaving}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md transition-all"
-              >
-                {isSaving ? "Saving..." : "Save Changes"}
-              </Button>
-            </div>
-          </Card>
-        )}
-
-        {activeTab === "photo" && (
-          <Card className="p-6 space-y-4 shadow-lg rounded-xl text-center">
-            <h2 className="text-xl font-semibold mb-4">Profile Picture</h2>
-            <Avatar className="w-32 h-32 mx-auto ring-2 ring-blue-500">
-              {photoUrl ? (
-                <AvatarImage src={photoUrl} />
-              ) : (
-                <AvatarFallback>{name?.[0]}</AvatarFallback>
-              )}
-            </Avatar>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={onChangeHandler}
-              className="mt-4 file:rounded-md file:bg-blue-600 file:text-white file:px-4 file:py-2"
-            />
-            <Button
-              variant="destructive"
-              onClick={() => setRemoveStatus("removing")}
-              disabled={!photoUrl}
-            >
-              Remove Photo
-            </Button>
-            {removeStatus === "removing" && (
-              <p className="text-sm text-yellow-600">
-                Click Save to confirm removal.
-              </p>
-            )}
-            {/* Save button: right-aligned */}
-            <div className="mt-2 flex justify-end">
-              <Button
-                onClick={updateUserHandler}
-                disabled={isSaving}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md transition-all"
-              >
-                {isSaving ? "Saving..." : "Save Changes"}
-              </Button>
-            </div>
-          </Card>
-        )}
-
-        {activeTab === "password" && (
-          <Card className="p-6 space-y-4 shadow-lg rounded-xl max-w-md">
-            <h2 className="text-xl font-semibold mb-4">Change Password</h2>
-            <div className="space-y-1 relative">
-              <Label>Current Password</Label>
-              <Input
-                type={showCurrentPassword ? "text" : "password"}
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="Enter current password"
-                className="pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                className="absolute right-3 top-9 text-gray-500"
-              >
-                {showCurrentPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-            <div className="space-y-1 relative">
-              <Label>New Password</Label>
-              <Input
-                type={showNewPassword ? "text" : "password"}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter new password"
-                className="pr-10"
-                disabled={!currentPasswordValid}
-              />
-              <button
-                type="button"
-                onClick={() => setShowNewPassword(!showNewPassword)}
-                className="absolute right-3 top-9 text-gray-500"
-                disabled={!currentPasswordValid}
-              >
-                {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-            <div className="space-y-1 relative">
-              <Label>Confirm Password</Label>
-              <Input
-                type={showConfirmPassword ? "text" : "password"}
+      const Profile = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm new password"
@@ -414,6 +153,7 @@ const Profile = () => {
             )}
             {/* Update button: right-aligned */}
             <div className="flex justify-end">
+              <Button className="mt-4" onClick={handlePasswordChange}>
               <Button className="mt-4" onClick={() => setOtpDialogOpen(true)}>
                 Update Password
               </Button>
