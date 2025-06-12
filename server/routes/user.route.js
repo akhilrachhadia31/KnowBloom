@@ -8,6 +8,7 @@ import {
   updatePassword,
   checkCurrentPassword,
   verifyOtp,
+  verifyEmailChange,
   forgotPassword,
   resetPassword,
   getUserByUsername,
@@ -36,6 +37,7 @@ router.put(
 router.put("/update-password", isAuthenticated, updatePassword);
 router.post("/check-password", isAuthenticated, checkCurrentPassword);
 router.post("/verify-otp", verifyOtp);
+router.post("/verify-email-change", isAuthenticated, verifyEmailChange);
 
 // Google Auth
 router.get(
