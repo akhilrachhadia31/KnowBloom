@@ -21,33 +21,29 @@ connectDB();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 🛡️ Trust proxy for secure cookies on Render (IMPORTANT)
+// 🛡️ Trust proxy for secure cookies (needed on Render or reverse proxy)
 app.set("trust proxy", 1);
 
-// 🧾 Stripe webhook needs raw body
+// 🧾 Stripe webhook route (must be raw)
 app.use(
   "/api/v1/purchaseCourse/webhook",
   express.raw({ type: "application/json" })
 );
 
-// 🌍 CORS (must be above all routes)
+// 🌍 Enable CORS for frontend
 app.use(
   cors({
-<<<<<<< HEAD
-    origin: "https://knowbloom.onrender.com",
-=======
-    origin: "https://knowbloom.onrender.com", // frontend domain
->>>>>>> e0bb359b91c4b7263b1c50098be3c68aee652981
+    origin: "https://knowbloom.onrender.com", // replace with your frontend domain
     credentials: true,
   })
 );
 
-// 🧱 Body parsers (for JSON and forms)
+// 🧱 Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// 🛡️ Security headers
+// 🛡️ Secure headers
 app.use(helmet());
 
 // 🔐 Session and Passport setup
@@ -57,33 +53,33 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      sameSite: "none", // needed for cross-origin cookies
-      secure: true,     // HTTPS only
+      sameSite: "none",
+      secure: true,
     },
   })
 );
-
 app.use(passport.initialize());
 app.use(passport.session());
 
-// 🧪 Log origin (optional for debug)
+// 🧪 Log request origin (for debugging)
 app.use((req, res, next) => {
   console.log("Request Origin:", req.headers.origin);
   next();
 });
 
-// 🔗 Routes
+// 🔗 API routes
 app.use("/api/v1/media", mediaRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/course", courseRoute);
 app.use("/api/v1/purchase", purchaseRouter);
 app.use("/api/v1/progress", courseProgressRoute);
 
+// 🔘 Basic health route
 app.get("/", (req, res) => {
   res.send("KnowBloom backend is running!");
 });
 
-// 📦 Serve frontend build
+// 📦 Serve frontend (static build)
 const __dirname = path.resolve();
 app.use(
   history({
@@ -93,7 +89,7 @@ app.use(
 );
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
-// ❌ Error handling
+// ❌ Error handler
 app.use((err, req, res, next) => {
   console.error("Global error handler:", err.stack);
   res.status(500).json({ message: "Something went wrong!" });
