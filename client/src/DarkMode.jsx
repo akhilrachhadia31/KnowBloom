@@ -3,7 +3,7 @@ import React from "react";
 import { useTheme } from "./components/ThemeProvider";
 import { Sun, Moon } from "lucide-react";
 
-const themes = ["light", "dark", "system"];
+const themes = ["light", "dark"];
 const getNextTheme = (current) =>
   themes[(themes.indexOf(current) + 1) % themes.length];
 
