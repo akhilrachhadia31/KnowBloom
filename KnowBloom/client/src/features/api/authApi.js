@@ -2,7 +2,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { userLoggedIn, userLoggedOut } from "../authSlice";
 
-const USER_API = "http://localhost:8080/api/v1/user"; // remove trailing slash
+// Base URL for user-related APIs. Falls back to relative path if env not set.
+const USER_API =
+  import.meta.env.VITE_USER_API || "/api/v1/user";
 
 export const authApi = createApi({
   reducerPath: "authApi",
