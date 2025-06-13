@@ -19,7 +19,7 @@ test('login succeeds when stale token cookie is present', async () => {
   const server = app.listen(0);
   const { port } = server.address();
 
-  const response = await fetch(`http://127.0.0.1:${port}/login`, {
+  const response = await fetch(`https://127.0.0.1:${port}/login`, {
     method: 'POST',
     headers: { Cookie: 'token=staletoken' },
   });

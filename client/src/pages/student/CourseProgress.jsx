@@ -792,7 +792,7 @@ const CourseProgress = () => {
                         <div className="w-full lg:w-80 h-48 rounded-2xl overflow-hidden flex-shrink-0 shadow-lg ring-1 ring-gray-200/50 dark:ring-slate-700/50">
                           <img
                             src={
-                              imageUrl.startsWith("http")
+                              imageUrl.startsWith("https")
                                 ? imageUrl
                                 : `https://res.cloudinary.com/akhil31/image/upload/${imageUrl}`
                             }
