@@ -355,7 +355,32 @@ const CourseDetail = () => {
                 </CardContent>
               </Card>
             )}
-
+          {/* Requirements */}
+          {Array.isArray(course.priorRequirements) &&
+            course.priorRequirements.length > 0 && (
+              <Card className="bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-lg text-gray-900 dark:text-gray-100">
+                    Requirements
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <ul className="space-y-3">
+                    {course.priorRequirements.map((req, idx) => (
+                      <li
+                        key={idx}
+                        className="flex items-start gap-3 text-gray-700 dark:text-gray-300"
+                      >
+                        <span className="text-gray-400 dark:text-gray-500 mt-1">
+                          •
+                        </span>
+                        <span>{req}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            )}
           {/* Modules Accordion */}
           <Card className="bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700">
             <CardHeader>
@@ -514,109 +539,8 @@ const CourseDetail = () => {
               </p>
             </div>
           )}
-        </div>
 
-        {/* Right pane */}
-        <div className="lg:col-span-1 space-y-8">
-          {/* Requirements */}
-          {Array.isArray(course.priorRequirements) &&
-            course.priorRequirements.length > 0 && (
-              <Card className="bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-lg text-gray-900 dark:text-gray-100">
-                    Requirements
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <ul className="space-y-3">
-                    {course.priorRequirements.map((req, idx) => (
-                      <li
-                        key={idx}
-                        className="flex items-start gap-3 text-gray-700 dark:text-gray-300"
-                      >
-                        <span className="text-gray-400 dark:text-gray-500 mt-1">
-                          •
-                        </span>
-                        <span>{req}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
-          {!selectedLectureInfo && (
-            <Card className="bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700">
-              <CardContent className="p-6 flex flex-col items-center">
-                <p className="text-3xl font-bold text-indigo-700 dark:text-indigo-300 mb-6">
-                  ₹{course.coursePrice}
-                </p>
-
-                {!isCreator && (
-                  <Button
-                    onClick={handleStartLearning}
-                    className={`w-full py-3 text-lg font-semibold rounded-lg transition-all duration-200 ${
-                      canAccess
-                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                  >
-                    Purchase Required
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          )}
-          {selectedLectureInfo?.type === "video" && (
-            <div className="sticky top-20">
-              <div className="relative w-full overflow-hidden rounded-lg shadow-lg bg-gray-200 dark:bg-gray-800">
-                {/* Close button */}
-                <button
-                  onClick={() => setSelectedLectureInfo(null)}
-                  className="absolute top-3 right-3 z-20 bg-gray-100 dark:bg-gray-700 rounded-full p-1 hover:bg-red-100 dark:hover:bg-red-900 transition"
-                  title="Close video"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-gray-500 dark:text-gray-200"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-                <div className="pt-[56.25%]"></div>
-                <ReactPlayer
-                  url={selectedLectureInfo.url}
-                  controls
-                  width="100%"
-                  height="100%"
-                  className="absolute top-0 left-0"
-                />
-              </div>
-              <h3 className="mt-4 text-xl font-semibold text-gray-900 dark:text-gray-100 px-2">
-                {selectedLectureInfo.title}
-              </h3>
-            </div>
-          )}
-          {selectedLectureInfo?.type === "quiz" && (
-            <div className="sticky top-20">
-              <QuizViewer
-                courseId={courseId}
-                moduleId={selectedLectureInfo.moduleId}
-                lectureId={selectedLectureInfo.lectureId}
-                onClose={() => setSelectedLectureInfo(null)}
-                isInstructor={isCreator}
-              />
-            </div>
-          )}
-          + {/* Always show student reviews below video/quiz or price card */}
-          {!isCreator && (
+          {!purchased && !isCreator && (
             <Card className="bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700">
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
@@ -743,6 +667,81 @@ const CourseDetail = () => {
                 )}
               </CardContent>
             </Card>
+          )}
+        </div>
+
+        {/* Right pane */}
+        <div className="lg:col-span-1 space-y-8">
+          {!selectedLectureInfo && (
+            <Card className="bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700">
+              <CardContent className="p-6 flex flex-col items-center">
+                <p className="text-3xl font-bold text-indigo-700 dark:text-indigo-300 mb-6">
+                  ₹{course.coursePrice}
+                </p>
+
+                {!isCreator && (
+                  <Button
+                    onClick={handleStartLearning}
+                    className={`w-full py-3 text-lg font-semibold rounded-lg transition-all duration-200 ${
+                      canAccess
+                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
+                  >
+                    Purchase Required
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          )}
+          {selectedLectureInfo?.type === "video" && (
+            <div className="sticky top-20">
+              <div className="relative w-full overflow-hidden rounded-lg shadow-lg bg-gray-200 dark:bg-gray-800">
+                {/* Close button */}
+                <button
+                  onClick={() => setSelectedLectureInfo(null)}
+                  className="absolute top-3 right-3 z-20 bg-gray-100 dark:bg-gray-700 rounded-full p-1 hover:bg-red-100 dark:hover:bg-red-900 transition"
+                  title="Close video"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-gray-500 dark:text-gray-200"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+                <div className="pt-[56.25%]"></div>
+                <ReactPlayer
+                  url={selectedLectureInfo.url}
+                  controls
+                  width="100%"
+                  height="100%"
+                  className="absolute top-0 left-0"
+                />
+              </div>
+              <h3 className="mt-4 text-xl font-semibold text-gray-900 dark:text-gray-100 px-2">
+                {selectedLectureInfo.title}
+              </h3>
+            </div>
+          )}
+          {selectedLectureInfo?.type === "quiz" && (
+            <div className="sticky top-20">
+              <QuizViewer
+                courseId={courseId}
+                moduleId={selectedLectureInfo.moduleId}
+                lectureId={selectedLectureInfo.lectureId}
+                onClose={() => setSelectedLectureInfo(null)}
+                isInstructor={isCreator}
+              />
+            </div>
           )}
         </div>
       </div>
