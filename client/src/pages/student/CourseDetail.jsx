@@ -688,7 +688,7 @@ const CourseDetail = () => {
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                     }`}
                   >
-                    Purchase Required
+                    {canAccess ? "Start Learning" : "Purchase Required"}
                   </Button>
                 )}
               </CardContent>

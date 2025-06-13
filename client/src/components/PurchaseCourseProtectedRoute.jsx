@@ -9,9 +9,8 @@ const PurchaseCourseProtectedRoute = ({ children }) => {
   const { data, isLoading, isError } =
     useGetCourseDetailWithStatusQuery(courseId);
 
-  if (isLoading)
-  {
-    <LoadingScreen/>
+  if (isLoading) {
+    <LoadingScreen />;
   }
   if (isError) return <p>Failed to load purchase status.</p>;
 
