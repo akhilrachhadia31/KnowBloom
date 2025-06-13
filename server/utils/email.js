@@ -42,13 +42,13 @@ const otpTemplate = (userName, otp) => `
         <tr><td align="center" style="padding:36px 0 18px;">
          <img
   src="${LOGO_URL}"
-  width="120"
-  height="120"
+  width="500"
+  height="500"
   alt="Logo"
   style="
     display:block;
     margin:0 auto 18px;
-    width:120px;
+    width:500px;
     height:auto;
     border-radius:12px;
     box-shadow:0 2px 8px rgba(0,0,0,.1);
@@ -92,13 +92,13 @@ const passwordResetTemplate = (userName, otp, resetLink) => `
         <tr><td align="center" style="padding:36px 0 18px;">
           <img
   src="${LOGO_URL}"
-  width="120"
-  height="120"
+  width="500"
+  height="500"
   alt="Logo"
   style="
     display:block;
     margin:0 auto 18px;
-    width:120px;
+    width:500px;
     height:auto;
     border-radius:12px;
     box-shadow:0 2px 8px rgba(0,0,0,.1);
@@ -327,13 +327,13 @@ export async function sendPurchaseConfirmationEmail({
         <tr><td style="background:#1e3a8a;padding:24px 0;text-align:center;border-radius:12px 12px 0 0;">
           <img
   src="${LOGO_URL}"
-  width="120"
-  height="120"
+  width="500"
+  height="500"
   alt="Logo"
   style="
     display:block;
     margin:0 auto 18px;
-    width:120px;
+    width:500px;
     height:auto;
     border-radius:12px;
     box-shadow:0 2px 8px rgba(0,0,0,.1);
@@ -394,13 +394,13 @@ export async function sendCourseInformationEmail({
         <tr><td align="center" style="padding:32px 0 12px;">
          <img
   src="${LOGO_URL}"
-  width="120"
-  height="120"
+  width="500"
+  height="500"
   alt="Logo"
   style="
     display:block;
     margin:0 auto 18px;
-    width:120px;
+    width:500px;
     height:auto;
     border-radius:12px;
     box-shadow:0 2px 8px rgba(0,0,0,.1);
