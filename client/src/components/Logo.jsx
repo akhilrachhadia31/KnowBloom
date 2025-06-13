@@ -3,17 +3,17 @@ import { BookOpen, Leaf } from "lucide-react";
 import html2canvas from "html2canvas";
 
 const sizeClasses = {
-  sm: { icon: "w-6 h-6", text: "text-lg", spacing: "gap-2" },
-  md: { icon: "w-8 h-8", text: "text-xl", spacing: "gap-3" },
-  lg: { icon: "w-12 h-12", text: "text-3xl", spacing: "gap-4" },
-  xl: { icon: "w-16 h-16", text: "text-4xl", spacing: "gap-5" },
+  sm: { icon: "24px", text: "16px", spacing: "8px" },
+  md: { icon: "32px", text: "20px", spacing: "12px" },
+  lg: { icon: "48px", text: "24px", spacing: "16px" },
+  xl: { icon: "64px", text: "32px", spacing: "20px" },
 };
 
-const getLeafSize = (icon) => {
-  if (icon === "w-6 h-6") return "w-4 h-4";
-  if (icon === "w-8 h-8") return "w-5 h-5";
-  if (icon === "w-12 h-12") return "w-7 h-7";
-  return "w-9 h-9";
+const getLeafSize = (iconSize) => {
+  if (iconSize === "24px") return "16px";
+  if (iconSize === "32px") return "20px";
+  if (iconSize === "48px") return "28px";
+  return "36px";
 };
 
 const Logo = ({
@@ -43,42 +43,50 @@ const Logo = ({
   };
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "8px",
+      }}
+    >
       <div
         ref={logoRef}
-        className={`flex ${isStacked ? "flex-col" : "flex-row"} items-center ${
-          currentSize.spacing
-        } ${className}`}
+        className={className}
         style={{
-          backgroundColor: "white", // safe fallback
-          padding: "1rem",
-          borderRadius: "0.5rem",
+          backgroundColor: "#ffffff",
+          borderRadius: "8px",
+          padding: "12px 16px",
+          display: "flex",
+          flexDirection: isStacked ? "column" : "row",
+          alignItems: "center",
+          gap: currentSize.spacing,
           fontFamily: "sans-serif",
         }}
       >
-        <div className="relative">
+        <div style={{ position: "relative" }}>
           <BookOpen
-            className={currentSize.icon}
-            style={{ color: "#2563EB", width: "2rem", height: "2rem" }}
+            style={{
+              color: "#2563EB", // Tailwind blue-600
+              width: currentSize.icon,
+              height: currentSize.icon,
+            }}
           />
           <Leaf
-            className={getLeafSize(currentSize.icon)}
             style={{
-              color: "#22C55E",
+              color: "#22C55E", // Tailwind green-500
+              width: getLeafSize(currentSize.icon),
+              height: getLeafSize(currentSize.icon),
               position: "absolute",
-              top: "-0.25rem",
-              right: "-0.25rem",
+              top: "-6px",
+              right: "-6px",
               transform: "rotate(12deg)",
-              width: "1rem",
-              height: "1rem",
             }}
           />
         </div>
         {showText && (
-          <div
-            className={`${currentSize.text} font-bold`}
-            style={{ fontSize: "1.25rem", fontWeight: "bold" }}
-          >
+          <div style={{ fontSize: currentSize.text, fontWeight: "bold" }}>
             <span style={{ color: "#1D4ED8" }}>Know</span>
             <span style={{ color: "#16A34A" }}>Bloom</span>
           </div>
@@ -87,7 +95,15 @@ const Logo = ({
 
       <button
         onClick={downloadImage}
-        className="mt-2 px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+        style={{
+          marginTop: "10px",
+          padding: "6px 12px",
+          backgroundColor: "#2563EB",
+          color: "white",
+          border: "none",
+          borderRadius: "6px",
+          cursor: "pointer",
+        }}
       >
         Download Logo
       </button>
