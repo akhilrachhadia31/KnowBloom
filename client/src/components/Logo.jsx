@@ -1,3 +1,4 @@
+// src/components/Logo.jsx
 import React, { useRef } from "react";
 import { BookOpen, Leaf } from "lucide-react";
 
@@ -9,6 +10,16 @@ const sizeMap = {
 };
 const leafSizeMap = { 24: 16, 32: 20, 48: 28, 64: 36 };
 
+// Recursively walk the cloned node and inline every computed style
+function inlineAllStyles(el) {
+  const cs = window.getComputedStyle(el);
+  const cssText = Array.from(cs)
+    .map((prop) => `${prop}:${cs.getPropertyValue(prop)};`)
+    .join("");
+  el.setAttribute("style", cssText);
+  Array.from(el.children).forEach(inlineAllStyles);
+}
+
 export default function Logo({
   size = "md",
   variant = "horizontal",
@@ -17,45 +28,53 @@ export default function Logo({
   const { icon, text, gap } = sizeMap[size] || sizeMap.md;
   const leaf = leafSizeMap[icon];
   const isStacked = variant === "stacked";
-  const logoRef = useRef();
+  const logoRef = useRef(null);
 
-  // This function serializes the logo container as an SVG + foreignObject,
-  // then draws it onto a <canvas> and triggers a PNG download.
   const downloadViaSVG = () => {
     if (!logoRef.current) return;
-    const node = logoRef.current;
-    const { width, height } = node.getBoundingClientRect();
 
-    // 1) Serialize the DOM node
-    const serialized = new XMLSerializer().serializeToString(node);
+    // 1) Clone the node (so we don’t stomp on the live DOM)
+    const clone = logoRef.current.cloneNode(true);
+    // 2) Make sure the root has the XHTML namespace
+    clone.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+    // 3) Inline all styles so there are no external CSS/fonts
+    inlineAllStyles(clone);
 
-    // 2) Wrap it in an <svg><foreignObject>...
+    // 4) Wrap in <svg><foreignObject>…
+    const { width, height } = logoRef.current.getBoundingClientRect();
+    const serialized = new XMLSerializer().serializeToString(clone);
     const svg = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="${width}" height="${height}">
         <foreignObject width="100%" height="100%">
           ${serialized}
         </foreignObject>
       </svg>
     `;
 
-    // 3) Create a blob URL for that SVG
+    // 5) Turn it into an image, draw on canvas, export
     const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const img = new Image();
     img.onload = () => {
-      // 4) Draw the image onto a canvas
+      // High-DPI support
+      const dpr = window.devicePixelRatio || 1;
       const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
       const ctx = canvas.getContext("2d");
-      if (ctx) ctx.drawImage(img, 0, 0);
-      URL.revokeObjectURL(url);
-
-      // 5) Trigger download
-      const a = document.createElement("a");
-      a.download = "knowbloom-logo.png";
-      a.href = canvas.toDataURL("image/png");
-      a.click();
+      if (ctx) {
+        ctx.scale(dpr, dpr);
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+        const a = document.createElement("a");
+        a.download = "knowbloom-logo.png";
+        a.href = canvas.toDataURL("image/png");
+        a.click();
+      }
+    };
+    img.onerror = (e) => {
+      console.error("SVG → Image conversion failed", e);
     };
     img.src = url;
   };
@@ -76,7 +95,7 @@ export default function Logo({
           flexDirection: isStacked ? "column" : "row",
           alignItems: "center",
           columnGap: `${gap}px`,
-          backgroundColor: "#ffffff",
+          backgroundColor: "#fff",
           padding: "12px 16px",
           borderRadius: "8px",
         }}
@@ -95,7 +114,6 @@ export default function Logo({
             }}
           />
         </div>
-
         {showText && (
           <div style={{ fontSize: text, fontWeight: 700, display: "flex" }}>
             <span style={{ color: "#1D4ED8" }}>Know</span>
@@ -103,13 +121,12 @@ export default function Logo({
           </div>
         )}
       </div>
-
       <button
         onClick={downloadViaSVG}
         style={{
           padding: "6px 12px",
           backgroundColor: "#2563EB",
-          color: "#ffffff",
+          color: "#fff",
           border: "none",
           borderRadius: "6px",
           cursor: "pointer",
