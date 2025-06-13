@@ -40,7 +40,21 @@ const otpTemplate = (userName, otp) => `
     <tr><td align="center">
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:420px;background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(30,58,138,0.09);margin:40px 0;">
         <tr><td align="center" style="padding:36px 0 18px;">
-          <img src="${LOGO_URL}" width="56" alt="Logo" style="margin-bottom:18px;border-radius:8px;box-shadow:0 1px 6px rgba(0,0,0,.07);">
+         <img
+  src="${LOGO_URL}"
+  width="120"
+  height="120"
+  alt="Logo"
+  style="
+    display:block;
+    margin:0 auto 18px;
+    width:120px;
+    height:auto;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+  "
+/>
+
           <h2 style="margin:0;font-family:'Segoe UI',Arial,sans-serif;color:#1e3a8a;font-weight:700;font-size:22px;letter-spacing:0.5px;">
             Welcome to KnowBloom Platform!
           </h2>
@@ -76,7 +90,21 @@ const passwordResetTemplate = (userName, otp, resetLink) => `
     <tr><td align="center">
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:420px;background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(30,58,138,0.09);margin:40px 0;">
         <tr><td align="center" style="padding:36px 0 18px;">
-          <img src="${LOGO_URL}" width="56" alt="Logo" style="margin-bottom:18px;border-radius:8px;box-shadow:0 1px 6px rgba(0,0,0,.07);">
+          <img
+  src="${LOGO_URL}"
+  width="120"
+  height="120"
+  alt="Logo"
+  style="
+    display:block;
+    margin:0 auto 18px;
+    width:120px;
+    height:auto;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+  "
+/>
+
           <h2 style="margin:0;font-family:'Segoe UI',Arial,sans-serif;color:#1e3a8a;font-weight:700;font-size:22px;letter-spacing:0.5px;">
             Reset Your Password
           </h2>
@@ -297,7 +325,21 @@ export async function sendPurchaseConfirmationEmail({
     <tr><td align="center">
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;">
         <tr><td style="background:#1e3a8a;padding:24px 0;text-align:center;border-radius:12px 12px 0 0;">
-          <img src="${LOGO_URL}" width="56" alt="Logo" style="margin-bottom:10px;border-radius:8px;box-shadow:0 1px 6px rgba(0,0,0,.07);">
+          <img
+  src="${LOGO_URL}"
+  width="120"
+  height="120"
+  alt="Logo"
+  style="
+    display:block;
+    margin:0 auto 18px;
+    width:120px;
+    height:auto;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+  "
+/>
+
           <h1 style="margin:0;font-family:'Segoe UI',Arial,sans-serif;font-size:26px;color:#fff;font-weight:700;letter-spacing:1px;">
             🎉 Welcome to KnowBloom Academy!
           </h1>
@@ -350,7 +392,21 @@ export async function sendCourseInformationEmail({
     <tr><td align="center">
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:420px;background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(30,58,138,0.09);margin:40px 0;">
         <tr><td align="center" style="padding:32px 0 12px;">
-          <img src="${LOGO_URL}" width="56" alt="Logo" style="margin-bottom:12px;border-radius:8px;box-shadow:0 1px 6px rgba(0,0,0,.07);">
+         <img
+  src="${LOGO_URL}"
+  width="120"
+  height="120"
+  alt="Logo"
+  style="
+    display:block;
+    margin:0 auto 18px;
+    width:120px;
+    height:auto;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+  "
+/>
+
           <h2 style="margin:0;font-family:'Segoe UI',Arial,sans-serif;color:#1e3a8a;font-weight:700;font-size:22px;letter-spacing:0.5px;">
             Course Update
           </h2>
