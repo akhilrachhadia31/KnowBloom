@@ -7,7 +7,7 @@ import PDFDocument from "pdfkit";
 export const EMAIL_USER = process.env.EMAIL_USER;
 export const EMAIL_PASS = process.env.EMAIL_PASS;
 export const USER_NAME = process.env.USER_NAME || "KnowBloom Team";
-const LOGO_URL = process.env.LOGO_URL || "";
+const LOGO_URL = "https://knowbloom.onrender.com/logo.png";
 
 // create a single Gmail transporter
 const transporter = nodemailer.createTransport({
@@ -53,7 +53,7 @@ const otpTemplate = (userName, otp) => `
               ${otp}
             </span>
           </p>
-          <p style="margin:0 0 16px;color:#666;">This OTP will expire in 5 minutes. If you didn't request this, please ignore this email.</p>
+          <p style="margin:0 0 16px;color:#666;">This OTP will expire in 30 seconds. If you didn't request this, please ignore this email.</p>
           <p style="margin:30px 0 0;color:#1e293b;">Cheers,<br>The KnowBloom Team</p>
         </td></tr>
         <tr><td style="padding:22px 36px 0;font-size:12px;color:#94a3b8;text-align:center;">
@@ -90,7 +90,7 @@ const passwordResetTemplate = (userName, otp, resetLink) => `
               Reset Password
             </a>
           </p>
-          <p style="margin:0 0 16px;color:#666;">This OTP will expire in 5 minutes. If you didn't request this, you can safely ignore this email.</p>
+          <p style="margin:0 0 16px;color:#666;">This OTP will expire in 30 seconds. If you didn't request this, you can safely ignore this email.</p>
           <p style="margin:30px 0 0;color:#1e293b;">Regards,<br>The KnowBloom Team</p>
         </td></tr>
         <tr><td style="padding:22px 36px 0;font-size:12px;color:#94a3b8;text-align:center;">
@@ -250,7 +250,7 @@ export async function sendOtpEmail(email, otp, userName = "User") {
     from: `${USER_NAME} <${EMAIL_USER}>`,
     to: email,
     subject: "Your OTP Code",
-    text: `Hello ${userName},\n\nYour OTP code is ${otp}. It expires in 5 minutes.`,
+    text: `Hello ${userName},\n\nYour OTP code is ${otp}. It expires in 30 seconds.`,
     html: otpTemplate(userName, otp),
   };
   await transporter.sendMail(mailOptions);
