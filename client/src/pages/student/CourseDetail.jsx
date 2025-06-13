@@ -544,7 +544,6 @@ const CourseDetail = () => {
                 </CardContent>
               </Card>
             )}
-
           {!selectedLectureInfo && (
             <Card className="bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700">
               <CardContent className="p-6 flex flex-col items-center">
@@ -567,7 +566,6 @@ const CourseDetail = () => {
               </CardContent>
             </Card>
           )}
-
           {selectedLectureInfo?.type === "video" && (
             <div className="sticky top-20">
               <div className="relative w-full overflow-hidden rounded-lg shadow-lg bg-gray-200 dark:bg-gray-800">
@@ -606,7 +604,6 @@ const CourseDetail = () => {
               </h3>
             </div>
           )}
-
           {selectedLectureInfo?.type === "quiz" && (
             <div className="sticky top-20">
               <QuizViewer
@@ -618,7 +615,8 @@ const CourseDetail = () => {
               />
             </div>
           )}
-          {!purchased && !isCreator && (
+          + {/* Always show student reviews below video/quiz or price card */}
+          {!isCreator && (
             <Card className="bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700">
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
