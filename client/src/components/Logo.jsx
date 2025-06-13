@@ -1,7 +1,5 @@
-// src/components/Logo.jsx
 import React, { useRef } from "react";
 import { BookOpen, Leaf } from "lucide-react";
-import html2canvas from "html2canvas";
 
 const sizeMap = {
   sm: { icon: 24, text: 16, gap: 8 },
@@ -21,20 +19,45 @@ export default function Logo({
   const isStacked = variant === "stacked";
   const logoRef = useRef();
 
-  const download = async () => {
-    try {
-      const canvas = await html2canvas(logoRef.current, {
-        backgroundColor: null,
-        useCORS: true,
-        logging: false,
-      });
+  // This function serializes the logo container as an SVG + foreignObject,
+  // then draws it onto a <canvas> and triggers a PNG download.
+  const downloadViaSVG = () => {
+    if (!logoRef.current) return;
+    const node = logoRef.current;
+    const { width, height } = node.getBoundingClientRect();
+
+    // 1) Serialize the DOM node
+    const serialized = new XMLSerializer().serializeToString(node);
+
+    // 2) Wrap it in an <svg><foreignObject>...
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+        <foreignObject width="100%" height="100%">
+          ${serialized}
+        </foreignObject>
+      </svg>
+    `;
+
+    // 3) Create a blob URL for that SVG
+    const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      // 4) Draw the image onto a canvas
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (ctx) ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+
+      // 5) Trigger download
       const a = document.createElement("a");
       a.download = "knowbloom-logo.png";
       a.href = canvas.toDataURL("image/png");
       a.click();
-    } catch (e) {
-      console.error("Canvas generation failed:", e);
-    }
+    };
+    img.src = url;
   };
 
   return (
@@ -43,10 +66,9 @@ export default function Logo({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        rowGap: "8px",
+        rowGap: 8,
       }}
     >
-      {/* the white rounded container */}
       <div
         ref={logoRef}
         style={{
@@ -57,21 +79,13 @@ export default function Logo({
           backgroundColor: "#ffffff",
           padding: "12px 16px",
           borderRadius: "8px",
-          // strip out any filters/shadows
-          filter: "none",
         }}
       >
         <div style={{ position: "relative", width: icon, height: icon }}>
-          <BookOpen
-            style={{
-              color: "#2563EB", // blue-600
-              width: icon,
-              height: icon,
-            }}
-          />
+          <BookOpen style={{ color: "#2563EB", width: icon, height: icon }} />
           <Leaf
             style={{
-              color: "#22C55E", // green-500
+              color: "#22C55E",
               width: leaf,
               height: leaf,
               position: "absolute",
@@ -91,7 +105,7 @@ export default function Logo({
       </div>
 
       <button
-        onClick={download}
+        onClick={downloadViaSVG}
         style={{
           padding: "6px 12px",
           backgroundColor: "#2563EB",
