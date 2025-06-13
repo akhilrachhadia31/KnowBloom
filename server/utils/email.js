@@ -325,7 +325,7 @@ export async function sendPurchaseConfirmationEmail({
     <tr><td align="center">
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;">
         <tr><td style="background:#1e3a8a;padding:24px 0;text-align:center;border-radius:12px 12px 0 0;">
-               <img
+                 <img
   src="${LOGO_URL}"
   width="300"
   height="300"
