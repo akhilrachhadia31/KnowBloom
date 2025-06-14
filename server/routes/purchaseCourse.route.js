@@ -12,14 +12,20 @@ import {
 const router = express.Router();
 
 // 1) POST /api/v1/purchase/checkout/create-checkout-session
+// router
+//   .route("/checkout/create-checkout-session")
+//   .post(isAuthenticated, createCheckoutSession);
+
+// 2) POST /api/v1/purchase/webhook
+// router
+//   .route("/webhook")
+//   .post(express.raw({ type: "application/json" }), stripeWebhook);
+
 router
   .route("/checkout/create-checkout-session")
   .post(isAuthenticated, createCheckoutSession);
 
-// 2) POST /api/v1/purchase/webhook
-router
-  .route("/webhook")
-  .post(express.raw({ type: "application/json" }), stripeWebhook);
+router.route("/webhook").post(express.json(), razorpayWebhook);
 
 // 3) GET /api/v1/purchase/course/:courseId/detail-with-status
 router
