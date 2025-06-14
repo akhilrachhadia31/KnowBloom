@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import { Module } from "../models/module.model.js";
 import { sendPurchaseConfirmationEmail } from "../utils/email.js";
 import Razorpay from "razorpay";
+import crypto from "crypto";
 
 dotenv.config();
 
