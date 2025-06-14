@@ -10,11 +10,6 @@ import { Module } from "../models/module.model.js";
 import { sendPurchaseConfirmationEmail } from "../utils/email.js";
 import Razorpay from "razorpay";
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_SECRET,
-});
-
 dotenv.config();
 
 // Ensure STRIPE_SECRET_KEY is provided
@@ -117,6 +112,21 @@ export const createCheckoutSession = async (req, res) => {
     if (!courseId) {
       return res.status(400).json({ message: "courseId is required" });
     }
+
+    const { RAZORPAY_KEY_ID, RAZORPAY_SECRET } = process.env;
+    if (!RAZORPAY_KEY_ID || !RAZORPAY_SECRET) {
+      console.error(
+        "Razorpay credentials missing: RAZORPAY_KEY_ID or RAZORPAY_SECRET"
+      );
+      return res
+        .status(500)
+        .json({ message: "Payment configuration is not properly set." });
+    }
+
+    const razorpay = new Razorpay({
+      key_id: RAZORPAY_KEY_ID,
+      key_secret: RAZORPAY_SECRET,
+    });
 
     const course = await Course.findById(courseId).lean();
     if (!course) {
