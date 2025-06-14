@@ -1,14 +1,13 @@
+// src/components/PurchaseHistory.jsx
 import React from "react";
 import { useSelector } from "react-redux";
 import { useGetPurchasedCoursesQuery } from "@/features/api/purchaseApi";
 import { useGetPublishedCourseQuery } from "@/features/api/courseApi";
 import { Link } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
 
 const PurchaseHistory = () => {
   const { user } = useSelector((store) => store.auth);
 
-  // don't fetch if not logged in
   const {
     data: purchaseData,
     isLoading: purchasesLoading,
@@ -23,20 +22,33 @@ const PurchaseHistory = () => {
 
   if (!user) {
     return (
-      <div className="text-center mt-10 text-gray-600">
-        Please log in to view your purchase history.
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
+        <div className="text-center text-lg text-gray-600 dark:text-gray-300">
+          Please log in to view your purchase history.
+        </div>
       </div>
     );
   }
 
   if (purchasesLoading || publishedLoading) {
-    return <div className="text-center mt-10">Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
+        <div className="text-center text-lg">
+          <div className="animate-pulse">
+            <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded mx-auto mb-4"></div>
+            <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded mx-auto"></div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (purchasesError || publishedError) {
     return (
-      <div className="text-center mt-10 text-red-500">
-        Failed to load purchase history.
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
+        <div className="text-center text-lg text-red-500">
+          Failed to load purchase history.
+        </div>
       </div>
     );
   }
@@ -46,9 +58,6 @@ const PurchaseHistory = () => {
     ? publishedData
     : publishedData?.courses || [];
 
-  // Only show those purchases where:
-  // 1. It belongs to the current user (purchase.userId === user._id)
-  // 2. The course still exists and is published
   const visiblePurchases = purchases.filter((p) => {
     const course = p.courseId;
     return (
@@ -58,87 +67,116 @@ const PurchaseHistory = () => {
     );
   });
 
+  if (visiblePurchases.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
+        <div className="text-center text-lg text-gray-600 dark:text-gray-300">
+          No purchases found.
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-3xl mx-auto py-10 px-2">
-      <h1 className="text-2xl font-bold mb-6">Purchase History</h1>
-      {visiblePurchases.length === 0 ? (
-        <div className="text-center text-gray-600">No purchases found.</div>
-      ) : (
-        <div className="space-y-6">
-          {visiblePurchases.map((purchase) => {
-            const course = purchase.courseId;
-            return (
-              <Card
-                key={purchase._id}
-                className="flex flex-col md:flex-row items-center p-4"
-              >
-                <img
-                  src={course.courseThumbnail || "/default-course.jpg"}
-                  alt={course.courseTitle}
-                  className="w-28 h-28 object-cover rounded-md border mb-3 md:mb-0 md:mr-6"
-                />
-                <CardContent className="flex-1">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div>
+    <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+      <h1 className="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-100">
+        Purchase History
+      </h1>
+      <div className="overflow-x-auto rounded-xl shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th className="px-8 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                Course
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                Category / Level
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                Amount
+              </th>
+
+              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                Date
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                Payment Status
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            {visiblePurchases.map((purchase) => {
+              const course = purchase.courseId;
+              return (
+                <tr
+                  key={purchase._id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <td className="px-8 py-5">
+                    <div className="flex items-center">
+                      <img
+                        src={course.courseThumbnail || "/default-course.jpg"}
+                        alt={course.courseTitle}
+                        className="w-20 h-20 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-600 mr-4"
+                      />
+                      <div>
+                        <Link
+                          to={`/course-detail/${course._id}`}
+                          className="text-lg font-bold text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          {course.courseTitle}
+                        </Link>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                          {course.courseSubtitle}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-5 text-sm text-gray-700 dark:text-gray-300">
+                    {course.category} / {course.courseLevel}
+                  </td>
+                  <td className="px-6 py-5 text-sm text-gray-700 dark:text-gray-300 font-medium">
+                    ₹{purchase.amount}
+                  </td>
+
+                  <td className="px-6 py-5 text-sm text-gray-700 dark:text-gray-300">
+                    {purchase.purchaseDate
+                      ? new Date(purchase.purchaseDate).toLocaleDateString(
+                          "en-GB"
+                        )
+                      : "-"}
+                  </td>
+
+                  <td className="px-6 py-5">
+                    <span
+                      className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold leading-5 ${
+                        purchase.status === "completed"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                          : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                      }`}
+                    >
+                      {purchase.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-5">
+                    <div className="flex space-x-3">
                       <Link
                         to={`/course-detail/${course._id}`}
-                        className="text-lg font-semibold text-blue-600 hover:underline"
+                        className="px-3 py-2 text-sm font-medium rounded-lg bg-cyan-600 text-white hover:bg-cyan-700 transition-colors"
                       >
-                        {course.courseTitle}
+                        Continue
                       </Link>
-                      <div className="text-gray-300 text-sm mb-1">
-                        {course.courseSubtitle}
-                      </div>
-                      <div className="text-sm text-gray-300 mt-1">
-                        <span className="font-medium">Category:</span>{" "}
-                        {course.category} &nbsp;|&nbsp;
-                        <span className="font-medium">Level:</span>{" "}
-                        {course.courseLevel}
-                      </div>
                     </div>
-                    <div className="md:text-right mt-2 md:mt-0">
-                      <div>
-                        <span className="font-semibold">Amount Paid:</span> ₹
-                        {purchase.amount}
-                      </div>
-                      <div>
-                        <span className="font-semibold">Invoice #:</span>{" "}
-                        {purchase.invoiceNumber || "-"}
-                      </div>
-                      <div>
-                        <span className="font-semibold">Date:</span>{" "}
-                        {purchase.purchaseDate
-                          ? new Date(purchase.purchaseDate).toLocaleDateString()
-                          : "-"}
-                      </div>
-                      <div>
-                        <span className="font-semibold">Status:</span>{" "}
-                        <span
-                          className={
-                            purchase.status === "completed"
-                              ? "text-green-600"
-                              : "text-yellow-500"
-                          }
-                        >
-                          {purchase.status}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-4 flex gap-3">
-                    <Link
-                      to={`/course-progress/${course._id}`}
-                      className="text-cyan-600 hover:underline font-medium"
-                    >
-                      Continue Learning
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
