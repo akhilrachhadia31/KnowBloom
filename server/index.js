@@ -21,6 +21,7 @@ connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 // Trust proxy for secure cookies
 app.set("trust proxy", 1);
@@ -28,7 +29,7 @@ app.set("trust proxy", 1);
 // CORS (must come before routes)
 app.use(
   cors({
-    origin: "https://knowbloom.onrender.com",
+    origin: FRONTEND_URL,
     credentials: true,
   })
 );
