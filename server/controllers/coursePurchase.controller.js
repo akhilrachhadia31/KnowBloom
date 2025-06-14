@@ -1,6 +1,6 @@
 // src/controllers/coursePurchase.controller.js
 
-import Stripe from "stripe";
+// import Stripe from "stripe";
 import { Course } from "../models/course.model.js";
 import { CoursePurchase } from "../models/coursePurchase.model.js";
 import { Lecture } from "../models/lecture.model.js"; // If you have a separate Lecture model; otherwise skip
@@ -18,11 +18,11 @@ const razorpay = new Razorpay({
 dotenv.config();
 
 // Ensure STRIPE_SECRET_KEY is provided
-if (!process.env.STRIPE_SECRET_KEY) {
-  console.error("⚠️ STRIPE_SECRET_KEY is not defined in your .env!");
-}
+// if (!key_secret) {
+//   console.error("⚠️ RAZORPAY_SECRET is not defined in your .env!");
+// }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 /**
  * POST /api/v1/purchase/checkout/create-checkout-session
