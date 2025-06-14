@@ -1,4 +1,4 @@
-// server/app.js (or index.js)
+// server/app.js
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
@@ -21,23 +21,17 @@ connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const FRONTEND_URL = process.env.FRONTEND_URL;
-const ALLOWED_ORIGIN =
-  process.env.ALLOWED_ORIGIN || FRONTEND_URL || "http://localhost:5173";
 
 // Trust proxy for secure cookies
 app.set("trust proxy", 1);
 
-// CORS (must come before routes)
+// CORS
 app.use(
   cors({
-    origin: ALLOWED_ORIGIN,
+    origin: process.env.FRONTEND_URL || "https://knowbloom.onrender.com",
     credentials: true,
   })
 );
-
-// Razorpay webhook needs raw body
-app.use("/api/v1/purchase/webhook", express.raw({ type: "application/json" }));
 
 // JSON / URL-encoded parsers
 app.use(express.json());
@@ -87,7 +81,7 @@ app.use(
 );
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
-// Error handlers
+// Global error handlers
 app.use((err, req, res, next) => {
   console.error("Global error:", err);
   res.status(500).json({ message: "Something went wrong" });

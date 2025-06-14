@@ -1,3 +1,5 @@
+// src/components/Course.jsx
+
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -167,6 +169,7 @@ const Course = ({ courseId, showPurchaseButton = true }) => {
     ? `/course-progress/${course._id}`
     : `/course-detail/${course._id}`;
 
+  // ---- UPDATED CHECKOUT HANDLER FOR RAZORPAY ----
   const handleBuyNow = async (e) => {
     e.preventDefault();
     if (!user) {
@@ -176,7 +179,24 @@ const Course = ({ courseId, showPurchaseButton = true }) => {
     setLocalError(null);
     try {
       const resp = await createCheckoutSession(course._id).unwrap();
-      if (resp.url) window.location.href = resp.url;
+      const { razorpayKey, amount, currency, orderId, successUrl, failureUrl } =
+        resp;
+      const options = {
+        key: razorpayKey,
+        amount, // in paise
+        currency,
+        order_id: orderId,
+        handler: function (paymentResult) {
+          window.location.href = successUrl;
+        },
+        modal: {
+          ondismiss: function () {
+            window.location.href = failureUrl;
+          },
+        },
+      };
+      const rz = new window.Razorpay(options);
+      rz.open();
     } catch {
       setLocalError("Failed to initiate checkout. Please try again.");
     }
@@ -187,12 +207,10 @@ const Course = ({ courseId, showPurchaseButton = true }) => {
     navigate(`/course-progress/${course._id}`);
   };
 
-  // ---- CARD LAYOUT ----
   return (
     <div className="group">
       <Link to={cardTarget} className="block h-full">
         <Card className="overflow-hidden aspect-[1/1] w-full max-w-xs flex flex-col rounded-2xl bg-white dark:bg-gray-900 shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 transition-all">
-          {/* Thumbnail + level + badge */}
           <div className="relative aspect-[1.7/1] w-full overflow-hidden">
             <img
               src={course.courseThumbnail || "/api/placeholder/400/400"}
@@ -213,7 +231,6 @@ const Course = ({ courseId, showPurchaseButton = true }) => {
             )}
           </div>
           <CardContent className="flex flex-col flex-1 justify-between px-4 pt-2 pb-3">
-            {/* Title + stars */}
             <div className="flex items-center justify-between gap-2 mb-1">
               <h2 className="font-bold text-[1.1rem] text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 flex-1">
                 {course.courseTitle}
@@ -222,7 +239,6 @@ const Course = ({ courseId, showPurchaseButton = true }) => {
                 {renderStars(avgRating)}
               </div>
             </div>
-            {/* Category */}
             {course.category && (
               <div className="mb-2">
                 <Badge className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-1 text-[10px] font-medium rounded">
@@ -230,7 +246,6 @@ const Course = ({ courseId, showPurchaseButton = true }) => {
                 </Badge>
               </div>
             )}
-            {/* Instructor row */}
             <div className="flex items-center gap-2 mt-1 mb-2">
               <Avatar className="h-6 w-6 border border-gray-200 dark:border-gray-700">
                 <AvatarImage src={instructorAvatar} alt="Instructor" />
@@ -242,7 +257,6 @@ const Course = ({ courseId, showPurchaseButton = true }) => {
                 {instructorName}
               </span>
             </div>
-            {/* Price + Button */}
             <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-2 mt-auto">
               <div className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 ₹{course.coursePrice}
@@ -270,7 +284,6 @@ const Course = ({ courseId, showPurchaseButton = true }) => {
                 </div>
               )}
             </div>
-            {/* Error */}
             {localError && (
               <div className="text-red-500 text-xs pt-1">{localError}</div>
             )}

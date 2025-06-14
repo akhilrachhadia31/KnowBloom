@@ -30,7 +30,6 @@ const SearchResult = ({ course }) => {
     );
   }
 
-  // use detailData.course if available, otherwise fallback to the `course` prop
   const dataSource = detailData?.course || course;
   const {
     courseThumbnail,
@@ -43,7 +42,6 @@ const SearchResult = ({ course }) => {
     studentsEnrolledCount,
   } = dataSource;
 
-  // flags for navigation
   const purchased = detailData?.purchased || false;
   const isCreator = detailData?.isCreator || false;
 
@@ -58,12 +56,10 @@ const SearchResult = ({ course }) => {
       </span>
     );
 
-  // clicking the card body always goes to detail
   const handleNavigate = () => {
     navigate(`/course-detail/${_id}`);
   };
 
-  // View Details button: if student & purchased → progress, else → detail
   const handleViewClick = (e) => {
     e.stopPropagation();
     if (purchased && !isCreator) {
@@ -73,15 +69,48 @@ const SearchResult = ({ course }) => {
     }
   };
 
-  // Buy Course button: create checkout session, then redirect
   const handleBuyClick = async (e) => {
     e.stopPropagation();
     try {
-      // pass _id directly (mutation expects courseId as its argument)
-      const result = await createCheckoutSession(_id).unwrap();
-      window.location.href = result.url;
+      // Pass the raw course ID, not an object
+      const resp = await createCheckoutSession(_id).unwrap();
+      const {
+        razorpayKey,
+        amount,
+        currency,
+        orderId,
+        successUrl,
+        failureUrl,
+        courseTitle,
+        courseThumbnail,
+      } = resp;
+
+      const options = {
+        key: razorpayKey,
+        amount,
+        currency,
+        name: courseTitle,
+        image: courseThumbnail,
+        order_id: orderId,
+        handler: () => {
+          window.location.href = successUrl;
+        },
+        modal: {
+          ondismiss: () => {
+            window.location.href = failureUrl;
+          },
+        },
+        prefill: {},
+        notes: { course_id: _id },
+        theme: { color: "#3399cc" },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", () => {
+        window.location.href = failureUrl;
+      });
+      rzp.open();
     } catch {
-      // fallback (e.g. not signed in)
       navigate("/login");
     }
   };

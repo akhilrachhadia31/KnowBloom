@@ -20,10 +20,7 @@ import {
   Instagram,
 } from "lucide-react";
 
-import {
-  useGetCourseDetailWithStatusQuery,
-  useCreateCheckoutSessionMutation,
-} from "@/features/api/purchaseApi";
+import { useGetCourseDetailWithStatusQuery } from "@/features/api/purchaseApi";
 import {
   useGetCourseDetailLegacyQuery,
   useGetCourseReviewsQuery,
@@ -74,7 +71,7 @@ const CourseDetail = () => {
   } = useGetCourseReviewsQuery(courseId);
   const reviews = reviewsData?.reviews || [];
 
-  // purchase-status or public detail
+  // Fetch purchase-status if logged in, else public detail
   const {
     data: purchaseData,
     isLoading: purchaseLoading,
@@ -93,9 +90,9 @@ const CourseDetail = () => {
   const isError = user ? purchaseError : publicError;
   const sourceData = user ? purchaseData : publicData;
   const course = sourceData?.course;
+  const [showAllReviews, setShowAllReviews] = useState(false);
   const purchased = user && purchaseData ? purchaseData.purchased : false;
   const isCreator = user && purchaseData ? purchaseData.isCreator : false;
-
   const {
     data: annsRes,
     isLoading: isAnnsLoading,
@@ -104,16 +101,19 @@ const CourseDetail = () => {
   const announcements = annsRes?.announcements || [];
   const canAccess = purchased || isCreator;
   const modules = Array.isArray(course?.modules) ? course.modules : [];
-
-  // instructor lookup
+  // first, pull out the creator object from your course payload
   const creator =
     Array.isArray(course?.creator) && course.creator.length
       ? course.creator[0]
       : course?.creator || null;
+
+  // then feed its _id into your instructor lookup hook—always at top level!
   const instructorId = creator?._id || "";
   const { data: fullInstructor = {} } = useGetInstructorByIdQuery(
     instructorId,
-    { skip: !instructorId }
+    {
+      skip: !instructorId,
+    }
   );
   const instructorName = fullInstructor.name || creator?.name || "Instructor";
   const instructorAvatar =
@@ -124,14 +124,10 @@ const CourseDetail = () => {
   const instructorLinkedin = fullInstructor.linkedin;
   const instructorTwitter = fullInstructor.twitter;
   const instructorInstagram = fullInstructor.instagram;
-
-  // Razorpay mutation hook
-  const [createCheckoutSession] = useCreateCheckoutSessionMutation();
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
-        <div className="animate-pulse rounded-full h-16 w-16 border-b-4 border-indigo-500"></div>
+        <div className=" animate-pulse rounded-full h-16 w-16 border-b-4 border-indigo-500"></div>
       </div>
     );
   }
@@ -151,49 +147,15 @@ const CourseDetail = () => {
     );
   }
 
-  const handleStartLearning = async () => {
+  const handleStartLearning = () => {
     if (!user) {
       toast.error("Please login to access this course.");
       return;
     }
     if (isCreator || purchased) {
       navigate(`/course-progress/${courseId}`);
-      return;
-    }
-    // initiate Razorpay order
-    try {
-      const res = await createCheckoutSession(courseId).unwrap();
-      const options = {
-        key: res.razorpayKey,
-        amount: res.amount,
-        currency: res.currency,
-        name: res.courseTitle,
-        image: res.courseThumbnail,
-        order_id: res.orderId,
-        handler: function (response) {
-          toast.success("Payment successful! Redirecting...");
-          navigate(`/course-progress/${courseId}`);
-        },
-        prefill: {
-          name: user.name,
-          email: user.email,
-        },
-        notes: {
-          course_id: courseId,
-        },
-        theme: {
-          color: "#3399cc",
-        },
-      };
-      const rzp = new window.Razorpay(options);
-      rzp.on("payment.failed", (err) => {
-        console.error(err);
-        toast.error("Payment failed. Please try again.");
-      });
-      rzp.open();
-    } catch (err) {
-      console.error(err);
-      toast.error(err?.data?.message || "Failed to initiate payment.");
+    } else {
+      toast.error("Purchase the course to start learning.");
     }
   };
 
