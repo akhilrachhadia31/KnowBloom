@@ -195,7 +195,6 @@ export const createCheckoutSession = async (req, res) => {
 
 //   // Only handle checkout.session.completed
 //   if (event.type === "checkout.session.completed") {
-//     console.log("stripeWebhook: checkout.session.completed");
 
 //     try {
 //       const session = event.data.object;
@@ -259,7 +258,6 @@ export const createCheckoutSession = async (req, res) => {
 //             invoiceNumber,
 //             purchaseDate,
 //           });
-//           console.log(`Purchase email sent to ${toEmail}`);
 //         } else {
 //           console.warn(
 //             "Page not found or missing email; cannot send invoice email."
@@ -355,7 +353,6 @@ export const getCourseDetailWithPurchaseStatus = async (req, res) => {
   try {
     const { courseId } = req.params;
     const userId = req.id;
-    console.log("Requested courseId:", courseId, "by userId:", userId);
 
     // 1. Fetch course document (with creator info)
     const courseDoc = await Course.findById(courseId)
@@ -363,7 +360,7 @@ export const getCourseDetailWithPurchaseStatus = async (req, res) => {
       .lean();
 
     if (!courseDoc) {
-      console.log("Course not found!");
+      console.error("Course not found!");
       return res.status(404).json({ message: "Course not found!" });
     }
 
@@ -377,7 +374,7 @@ export const getCourseDetailWithPurchaseStatus = async (req, res) => {
         })
         .lean();
     } catch (err) {
-      console.log("Error populating modules/lectures:", err);
+      console.error("Error populating modules/lectures:", err);
       modules = [];
     }
 
@@ -392,7 +389,7 @@ export const getCourseDetailWithPurchaseStatus = async (req, res) => {
           .lean();
       }
     } catch (err) {
-      console.log("Error fetching legacy lectures:", err);
+      console.error("Error fetching legacy lectures:", err);
       legacyLectureDocs = [];
     }
 
@@ -415,7 +412,7 @@ export const getCourseDetailWithPurchaseStatus = async (req, res) => {
         status: "completed",
       });
     } catch (err) {
-      console.log("Error counting enrollments:", err);
+      console.error("Error counting enrollments:", err);
       enrolledCount = 0;
     }
 

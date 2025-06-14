@@ -29,11 +29,11 @@ export const createModule = async (req, res) => {
     return res
       .status(201)
       .json({ module, message: "Module created successfully." });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Failed to create module" });
-  }
-};
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Failed to create module" });
+    }
+  };
 
 export const getCourseModules = async (req, res) => {
   try {
@@ -42,7 +42,7 @@ export const getCourseModules = async (req, res) => {
     if (!course) return res.status(404).json({ message: "Course not found" });
     return res.status(200).json({ modules: course.modules });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ message: "Failed to get modules" });
   }
 };
@@ -53,11 +53,11 @@ export const getModuleById = async (req, res) => {
     const module = await Module.findById(moduleId);
     if (!module) return res.status(404).json({ message: "Module not found" });
     return res.status(200).json({ module });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Failed to get module" });
-  }
-};
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Failed to get module" });
+    }
+  };
 
 export const editModule = async (req, res) => {
   try {
@@ -72,11 +72,11 @@ export const editModule = async (req, res) => {
     return res
       .status(200)
       .json({ module, message: "Module updated successfully." });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Failed to update module" });
-  }
-};
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Failed to update module" });
+    }
+  };
 
 // Only remove the module if it has no lectures
 export const removeModule = async (req, res) => {
@@ -103,7 +103,7 @@ export const removeModule = async (req, res) => {
 
     return res.status(200).json({ message: "Module deleted successfully." });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ message: "Failed to delete module" });
   }
 };
@@ -137,7 +137,7 @@ export const createModuleLecture = async (req, res) => {
       .status(201)
       .json({ lecture, message: "Lecture created successfully." });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ message: "Failed to create lecture" });
   }
 };
@@ -149,14 +149,13 @@ export const getModuleLectures = async (req, res) => {
     if (!module) return res.status(404).json({ message: "Module not found" });
     return res.status(200).json({ lectures: module.lectures });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ message: "Failed to get lectures" });
   }
 };
 
 export const editModuleLecture = async (req, res) => {
-  // ── console.log the entire body for debugging
-  console.log("editModuleLecture(req.body) =", JSON.stringify(req.body));
+  // Debugging statement removed to avoid logging sensitive request data
 
   try {
     const { lectureTitle, videoInfo, preview } = req.body;
@@ -247,11 +246,11 @@ export const removeModuleLecture = async (req, res) => {
     }
 
     return res.status(200).json({ message: "Lecture removed successfully." });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Failed to remove lecture" });
-  }
-};
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Failed to remove lecture" });
+    }
+  };
 
 // Fixed: always return at least { videoUrl, publicId, preview }
 export const getModuleLectureVideoInfo = async (req, res) => {
