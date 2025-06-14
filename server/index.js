@@ -1,3 +1,4 @@
+// server/app.js (or index.js)
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
@@ -21,16 +22,10 @@ connectDB();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 🛡️ Trust proxy for secure cookies on Render (IMPORTANT)
+// Trust proxy for secure cookies
 app.set("trust proxy", 1);
 
-// 🧾 Stripe webhook needs raw body
-app.use(
-  "/api/v1/purchaseCourse/webhook",
-  express.raw({ type: "application/json" })
-);
-
-// 🌍 CORS (must be above all routes)
+// CORS (must come before routes)
 app.use(
   cors({
     origin: "https://knowbloom.onrender.com",
@@ -38,48 +33,48 @@ app.use(
   })
 );
 
-// 🧱 Body parsers (for JSON and forms)
+// Razorpay webhook needs raw body
+app.use("/api/v1/purchase/webhook", express.raw({ type: "application/json" }));
+
+// JSON / URL-encoded parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// 🛡️ Security headers
+// Security headers
 app.use(helmet());
 
-// 🔐 Session and Passport setup
+// Session & Passport
 app.use(
   session({
-    secret: process.env.SECRET_KEY || "your-secret",
+    secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: false,
     cookie: {
-      sameSite: "none", // needed for cross-origin cookies
-      secure: true,     // HTTPS only
+      sameSite: "none",
+      secure: true,
     },
   })
 );
-
 app.use(passport.initialize());
 app.use(passport.session());
 
-// 🧪 Log origin (optional for debug)
+// Debug log
 app.use((req, res, next) => {
-  console.log("Request Origin:", req.headers.origin);
+  console.log(
+    `${req.method} ${req.originalUrl} - Origin: ${req.headers.origin}`
+  );
   next();
 });
 
-// 🔗 Routes
+// Mount routes
 app.use("/api/v1/media", mediaRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/course", courseRoute);
 app.use("/api/v1/purchase", purchaseRouter);
 app.use("/api/v1/progress", courseProgressRoute);
 
-app.get("/", (req, res) => {
-  res.send("KnowBloom backend is running!");
-});
-
-// 📦 Serve frontend build
+// SPA fallback + static
 const __dirname = path.resolve();
 app.use(
   history({
@@ -89,18 +84,15 @@ app.use(
 );
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
-// ❌ Error handling
+// Error handlers
 app.use((err, req, res, next) => {
-  console.error("Global error handler:", err.stack);
-  res.status(500).json({ message: "Something went wrong!" });
+  console.error("Global error:", err);
+  res.status(500).json({ message: "Something went wrong" });
 });
-
-// ❌ 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-// 🚀 Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
