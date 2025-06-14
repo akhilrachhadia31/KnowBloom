@@ -22,6 +22,8 @@ connectDB();
 const app = express();
 const PORT = process.env.PORT || 3000;
 const FRONTEND_URL = process.env.FRONTEND_URL;
+const ALLOWED_ORIGIN =
+  process.env.ALLOWED_ORIGIN || FRONTEND_URL || "http://localhost:5173";
 
 // Trust proxy for secure cookies
 app.set("trust proxy", 1);
@@ -29,7 +31,7 @@ app.set("trust proxy", 1);
 // CORS (must come before routes)
 app.use(
   cors({
-    origin: FRONTEND_URL,
+    origin: ALLOWED_ORIGIN,
     credentials: true,
   })
 );
