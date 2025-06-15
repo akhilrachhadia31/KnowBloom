@@ -21,6 +21,11 @@ import EditProfile from "@/components/EditProfile";
 
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/reset";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import RefundPolicy from "./pages/RefundPolicy";
 
 import LectureTab from "./pages/instructor/lecture/LectureTab";
 import Dashboard from "./pages/instructor/Dashboard";
@@ -86,6 +91,11 @@ const appRouter = createBrowserRouter([
       { path: ":username/edit-profile", element: <EditProfile /> },
       { path: "course-detail/:courseId", element: <CourseDetail /> },
       { path: "search", element: <SearchPage /> },
+      { path: "about", element: <About /> },
+      { path: "contact", element: <Contact /> },
+      { path: "privacy-policy", element: <PrivacyPolicy /> },
+      { path: "terms", element: <TermsOfService /> },
+      { path: "refund-policy", element: <RefundPolicy /> },
       {
         path: "course-progress/:courseId",
         element: (
