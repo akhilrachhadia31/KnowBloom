@@ -149,8 +149,18 @@ const CourseTab = () => {
   };
 
   const saveChanges = async () => {
-    if (!form.courseTitle.trim() || !form.description.trim()) {
-      toast.error("Title and description are required.");
+    if (
+      !form.courseTitle.trim() ||
+      !form.subTitle.trim() ||
+      !form.description.trim() ||
+      !form.category ||
+      !form.courseLevel ||
+      form.coursePrice === "" ||
+      !preview ||
+      form.whatYouWillLearn.some((i) => !i.trim()) ||
+      form.priorRequirements.some((i) => !i.trim())
+    ) {
+      toast.error("All fields are required.");
       return;
     }
     const formData = new FormData();
@@ -234,7 +244,7 @@ const CourseTab = () => {
   };
 
   if (loadingBasic) {
-    <LoadingScreen />;
+    return <LoadingScreen />;
   }
   if (errorBasic) return <p>Failed to load course.</p>;
 
@@ -258,6 +268,7 @@ const CourseTab = () => {
                 name="courseTitle"
                 value={form.courseTitle}
                 onChange={handleChange}
+                required
                 className="rounded-lg"
               />
             </div>
@@ -269,6 +280,7 @@ const CourseTab = () => {
                 name="subTitle"
                 value={form.subTitle}
                 onChange={handleChange}
+                required
                 className="rounded-lg"
               />
             </div>
@@ -292,6 +304,7 @@ const CourseTab = () => {
                     value={item}
                     onChange={(e) => handleLearnChange(idx, e.target.value)}
                     className="flex-1 rounded-lg"
+                    required
                     placeholder={`Learning outcome #${idx + 1}`}
                   />
                   <button
@@ -323,6 +336,7 @@ const CourseTab = () => {
                     value={item}
                     onChange={(e) => handlePriorChange(idx, e.target.value)}
                     className="flex-1 rounded-lg"
+                    required
                     placeholder={`Requirement #${idx + 1}`}
                   />
                   <button
@@ -352,6 +366,7 @@ const CourseTab = () => {
                   onValueChange={(val) =>
                     setForm((prev) => ({ ...prev, category: val }))
                   }
+                  required
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select category" />
@@ -397,6 +412,7 @@ const CourseTab = () => {
                   onValueChange={(val) =>
                     setForm((prev) => ({ ...prev, courseLevel: val }))
                   }
+                  required
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select level" />
@@ -422,6 +438,7 @@ const CourseTab = () => {
                   type="number"
                   value={form.coursePrice}
                   onChange={handleChange}
+                  required
                   className="rounded-lg"
                   placeholder="Enter price"
                 />
@@ -435,6 +452,7 @@ const CourseTab = () => {
                 name="courseThumbnail"
                 accept="image/*"
                 onChange={handleFile}
+                required
                 className="rounded-lg"
               />
               {preview && (
