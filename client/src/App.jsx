@@ -27,6 +27,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import RefundPolicy from "./pages/RefundPolicy";
 import LoginFailed from "./pages/LoginFailed";
+import PageNotFound from "./pages/PageNotFound";
 
 import LectureTab from "./pages/instructor/lecture/LectureTab";
 import Dashboard from "./pages/instructor/Dashboard";
@@ -51,7 +52,7 @@ const appRouter = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
-    errorElement: <div className="text-center py-20">404 - Page Not Found</div>,
+    errorElement: <PageNotFound />,
     children: [
       {
         index: true,
