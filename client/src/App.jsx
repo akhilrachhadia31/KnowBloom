@@ -15,7 +15,7 @@ import CourseDetail from "./pages/student/CourseDetail";
 import SearchPage from "./pages/student/SearchPage";
 import CourseProgress from "./pages/student/CourseProgress";
 import PurchaseCourseProtectedRoute from "./components/PurchaseCourseProtectedRoute";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+
 
 import UserProfile from "@/components/UserProfile";
 import EditProfile from "@/components/EditProfile";

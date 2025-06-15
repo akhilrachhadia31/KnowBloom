@@ -12,7 +12,7 @@ import { ThemeProvider } from "./components/ThemeProvider";
 import { UserContext } from "./context/UserContext";
 import Logo from "./components/Logo";
 import LoadingScreen from "./loadingscreen";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+
 
 const GOOGLE_CLIENT_ID =
   "93973601927-1oac2m22301vqafe54qkck61l9h19l9j.apps.googleusercontent.com";
