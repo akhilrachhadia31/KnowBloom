@@ -5,6 +5,7 @@ import { Outlet } from "react-router-dom";
 import InstructorSidebar from "@/pages/instructor/Sidebar";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const InstructorLayout = () => {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);

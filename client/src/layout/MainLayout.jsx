@@ -2,6 +2,7 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import React from "react";
 import { Outlet, useMatch } from "react-router-dom";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const MainLayout = () => {
   return (
