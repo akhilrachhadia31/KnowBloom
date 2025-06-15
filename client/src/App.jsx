@@ -27,6 +27,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import RefundPolicy from "./pages/RefundPolicy";
 import LoginFailed from "./pages/LoginFailed";
+import ServerError from "./pages/ServerError";
 
 import LectureTab from "./pages/instructor/lecture/LectureTab";
 import Dashboard from "./pages/instructor/Dashboard";
@@ -139,6 +140,10 @@ const appRouter = createBrowserRouter([
         element: <InstructorAnnouncements />,
       },
     ],
+  },
+  {
+    path: "/server-error",
+    element: <ServerError />,
   },
 ]);
 

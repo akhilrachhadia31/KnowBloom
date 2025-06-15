@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createCustomBaseQuery } from "./customBaseQuery";
 
 const COURSE_API = `${import.meta.env.VITE_API_URL}/api/v1/course`;
 
@@ -13,7 +14,7 @@ export const courseApi = createApi({
     "Students",
     "Announcement",
   ],
-  baseQuery: fetchBaseQuery({
+  baseQuery: createCustomBaseQuery({
     baseUrl: COURSE_API,
     credentials: "include",
   }),
