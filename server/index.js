@@ -29,7 +29,7 @@ app.set("trust proxy", 1);
 // CORS
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "https://knowbloom.onrender.com",
+    origin: process.env.FRONTEND_URL || "https://know-bloomvercel.vercel.app",
     credentials: true,
   })
 );

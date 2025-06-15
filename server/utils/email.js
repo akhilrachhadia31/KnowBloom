@@ -8,7 +8,7 @@ import { log } from "./logger.js";
 export const EMAIL_USER = process.env.EMAIL_USER;
 export const EMAIL_PASS = process.env.EMAIL_PASS;
 export const USER_NAME = process.env.USER_NAME || "KnowBloom Team";
-const LOGO_URL = "https://knowbloom.onrender.com/logo.png";
+const LOGO_URL = "https://know-bloomvercel.vercel.app/logo.png";
 
 // create a single Gmail transporter
 const transporter = nodemailer.createTransport({

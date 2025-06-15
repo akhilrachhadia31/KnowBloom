@@ -64,8 +64,8 @@ export const createCheckoutSession = async (req, res) => {
       currency: order.currency,
       courseTitle: course.courseTitle,
       courseThumbnail: course.courseThumbnail,
-      successUrl: `https://knowbloom.onrender.com/course-progress/${courseId}`,
-      failureUrl: `https://knowbloom.onrender.com/course-detail/${courseId}`,
+      successUrl: `https://know-bloomvercel.vercel.app/course-progress/${courseId}`,
+      failureUrl: `https://know-bloomvercel.vercel.app/course-detail/${courseId}`,
     });
   } catch (err) {
     console.error("createCheckoutSession error:", err);
