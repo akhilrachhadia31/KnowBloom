@@ -29,7 +29,8 @@ import RefundPolicy from "./pages/RefundPolicy";
 import LoginFailed from "./pages/LoginFailed";
 import PageNotFound from "./pages/PageNotFound";
 import ServerError from "./pages/ServerError";
- 
+import Unauthorized from "./pages/Unauthorized";
+import Forbidden from "./pages/Forbidden";
 
 import LectureTab from "./pages/instructor/lecture/LectureTab";
 import Dashboard from "./pages/instructor/Dashboard";
@@ -113,6 +114,8 @@ const appRouter = createBrowserRouter([
       },
     ],
   },
+  { path: "/unauthorized", element: <Unauthorized /> },
+  { path: "/forbidden", element: <Forbidden /> },
   {
     path: "/instructor",
     element: (

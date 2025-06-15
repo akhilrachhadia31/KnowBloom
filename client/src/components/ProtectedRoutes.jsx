@@ -1,18 +1,22 @@
+// src/routes/RouteGuards.jsx
+import React from "react";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import Unauthorized from "../pages/Unauthorized";
+import Forbidden from "../pages/Forbidden";
 
-// 🔐 Protect routes for authenticated users (like My Learning, My Profile)
+// 🔐 Protect routes for authenticated users
 export const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useSelector((store) => store.auth);
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Unauthorized />;
   }
 
   return children;
 };
 
-// 🔓 Allow only unauthenticated users (like Login, Signup)
+// 🔓 Allow only unauthenticated users (e.g. Login, Signup)
 export const AuthenticatedUser = ({ children }) => {
   const { isAuthenticated } = useSelector((store) => store.auth);
 
@@ -23,21 +27,20 @@ export const AuthenticatedUser = ({ children }) => {
   return children;
 };
 
-// 🔐 Instructor routes with instructor role check
-// renamed from “instructorRoute” to “InstructorRoute” (PascalCase!)
+// 🔥 Alias for clarity
+export const GuestOnlyRoute = AuthenticatedUser;
+
+// 🔐 Instructor routes with role check
 export const InstructorRoute = ({ children }) => {
   const { user, isAuthenticated } = useSelector((store) => store.auth);
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Unauthorized />;
   }
 
   if (user?.role !== "instructor") {
-    return <Navigate to="/" replace />;
+    return <Forbidden />;
   }
 
   return children;
 };
-
-// 🔥 👇 Optional: Add GuestOnlyRoute (same as AuthenticatedUser for clarity)
-export const GuestOnlyRoute = AuthenticatedUser;
