@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import nodemailer from "nodemailer";
 import PDFDocument from "pdfkit";
+import { log } from "./logger.js";
 
 export const EMAIL_USER = process.env.EMAIL_USER;
 export const EMAIL_PASS = process.env.EMAIL_PASS;
@@ -24,7 +25,7 @@ const transporter = nodemailer.createTransport({
 // verify SMTP connection on startup
 transporter.verify((err) => {
   if (err) console.error("SMTP connection error:", err);
-  else console.log("SMTP ready to send messages");
+  else log("SMTP ready to send messages");
 });
 
 // ──────────────────────────────────────────────────────────────────────────────
