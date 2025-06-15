@@ -20,8 +20,8 @@ const RefundPolicy = () => (
     <ol>
       <li>
         Email{" "}
-        <a href="mailto:support@knowbloom.com" className="text-cyan-600">
-          support@knowbloom.com
+        <a href="mailto:knowbloom.team@gmail.com" className="text-cyan-600">
+          knowbloom.team@gmail.com
         </a>{" "}
         with your order ID and reason.
       </li>
@@ -44,8 +44,8 @@ const RefundPolicy = () => (
     <h2>5. Contact</h2>
     <p>
       Questions? Email{" "}
-      <a href="mailto:support@knowbloom.com" className="text-cyan-600">
-        support@knowbloom.com
+      <a href="mailto:knowbloom.team@gmail.com" className="text-cyan-600">
+        knowbloom.team@gmail.com
       </a>
       .
     </p>

@@ -52,7 +52,7 @@ const PrivacyPolicy = () => (
     <h2>6. Your Rights</h2>
     <p>
       You can request access, correction, or deletion of your personal data at
-      any time by contacting support@knowbloom.com.
+      any time by contacting knowbloom.team@gmail.com.
     </p>
 
     <h2>7. Changes to This Policy</h2>

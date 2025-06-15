@@ -23,7 +23,7 @@ const Contact = () => (
         </div>
         <div className="flex items-center space-x-3">
           <Mail className="h-5 w-5 text-cyan-600" />
-          <span>support@knowbloom.com</span>
+          <span>knowbloom.team@gmail.com</span>
         </div>
         <div className="flex items-center space-x-3">
           <MapPin className="h-5 w-5 text-cyan-600" />

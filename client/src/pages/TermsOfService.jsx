@@ -57,8 +57,8 @@ const TermsOfService = () => (
     <h2>10. Contact</h2>
     <p>
       Questions? Email us at{" "}
-      <a href="mailto:support@knowbloom.com" className="text-cyan-600">
-        support@knowbloom.com
+      <a href="mailto:knowbloom.team@gmail.com" className="text-cyan-600">
+        knowbloom.team@gmail.com
       </a>
       .
     </p>
