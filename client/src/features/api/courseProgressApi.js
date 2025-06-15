@@ -1,12 +1,13 @@
 // src/features/api/courseProgressApi.js
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createCustomBaseQuery } from "./customBaseQuery";
 
 const COURSE_PROGRESS_API = `${import.meta.env.VITE_API_URL}/api/v1/progress`;
 
 
 export const courseProgressApi = createApi({
   reducerPath: "courseProgressApi",
-  baseQuery: fetchBaseQuery({
+  baseQuery: createCustomBaseQuery({
     baseUrl: COURSE_PROGRESS_API,
     credentials: "include",
   }),
