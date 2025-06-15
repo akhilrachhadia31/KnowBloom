@@ -212,8 +212,10 @@ const LectureTab = () => {
       };
     }
 
-    // DEBUG: log the final payload before sending:
-    console.log("[LectureTab] editLectureHandler → payload:", payload);
+    // DEBUG: log the final payload before sending
+    if (import.meta.env.DEV) {
+      console.log("[LectureTab] editLectureHandler → payload:", payload);
+    }
 
     try {
       await editLecture({ moduleId, lectureId, ...payload }).unwrap();

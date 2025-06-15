@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";
 import connectDB from "./database/db.js";
+import { log } from "./utils/logger.js";
 import userRoute from "./routes/user.route.js";
 import courseRoute from "./routes/course.route.js";
 import mediaRoute from "./routes/media.route.js";
@@ -58,7 +59,7 @@ app.use(passport.session());
 
 // Debug log
 app.use((req, res, next) => {
-  console.log(
+  log(
     `${req.method} ${req.originalUrl} - Origin: ${req.headers.origin}`
   );
   next();
@@ -91,5 +92,5 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  log(`🚀 Server running on port ${PORT}`);
 });
