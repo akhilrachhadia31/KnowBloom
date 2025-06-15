@@ -49,6 +49,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     successRedirect: process.env.FRONTEND_URL,
+    // Redirects to a client route showing the login failure message
     failureRedirect: "/login/failed",
   })
 );
