@@ -5,7 +5,7 @@ import {
   Phone,
   MapPin,
   Twitter,
-  LinkedIn,
+  Linkedin,
   Instagram,
 } from "lucide-react";
 
@@ -35,7 +35,7 @@ const Contact = () => (
             <Twitter className="h-6 w-6 text-gray-500 hover:text-cyan-600" />
           </a>
           <a href="#" aria-label="LinkedIn">
-            <LinkedIn className="h-6 w-6 text-gray-500 hover:text-cyan-600" />
+            <Linkedin className="h-6 w-6 text-gray-500 hover:text-cyan-600" />
           </a>
           <a href="#" aria-label="Instagram">
             <Instagram className="h-6 w-6 text-gray-500 hover:text-cyan-600" />
