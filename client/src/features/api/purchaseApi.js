@@ -1,12 +1,13 @@
 // src/features/api/purchaseApi.js
 
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createCustomBaseQuery } from "./customBaseQuery";
 
 const COURSE_PURCHASE_API = `${import.meta.env.VITE_API_URL}/api/v1/purchase`;
 
 export const purchaseApi = createApi({
   reducerPath: "purchaseApi",
-  baseQuery: fetchBaseQuery({
+  baseQuery: createCustomBaseQuery({
     baseUrl: COURSE_PURCHASE_API,
     credentials: "include",
   }),

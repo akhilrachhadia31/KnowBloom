@@ -84,7 +84,7 @@ app.use(express.static(path.join(__dirname, "../client/dist")));
 // Global error handlers
 app.use((err, req, res, next) => {
   console.error("Global error:", err);
-  res.status(500).json({ message: "Something went wrong" });
+  res.status(500).json({ message: "Something went wrong", code: "SERVER_ERROR" });
 });
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });

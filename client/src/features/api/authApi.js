@@ -1,12 +1,13 @@
 // src/features/api/authApi.js
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createCustomBaseQuery } from "./customBaseQuery";
 import { userLoggedIn, userLoggedOut } from "../authSlice";
 
 const USER_API = `${import.meta.env.VITE_API_URL}/api/v1/user`;
 
 export const authApi = createApi({
   reducerPath: "authApi",
-  baseQuery: fetchBaseQuery({
+  baseQuery: createCustomBaseQuery({
     baseUrl: USER_API,
     credentials: "include",
     prepareHeaders: (headers) => {
