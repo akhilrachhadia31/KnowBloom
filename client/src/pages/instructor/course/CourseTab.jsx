@@ -6,8 +6,7 @@ import { toast } from "react-hot-toast";
 import RichTextEditor from "@/components/RichTextEditor";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Logo from "@/components/Logo";
-import LoadingScreen from "@/loadingscreen";
+import Logo from "@/components/logo";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,6 +42,7 @@ import {
   useGetCourseByIdQuery,
   useGetCourseDetailQuery,
 } from "@/features/api/courseApi";
+import LoadingScreen from "@/loadingscreen";
 
 const CourseTab = () => {
   const { courseId } = useParams();
@@ -233,7 +233,7 @@ const CourseTab = () => {
     }
   };
 
-   if (loadingBasic) {
+  if (loadingBasic) {
     <LoadingScreen />;
   }
   if (errorBasic) return <p>Failed to load course.</p>;
